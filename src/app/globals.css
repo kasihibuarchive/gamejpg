@@ -1,0 +1,429 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-gothic);
+  --font-pixel: var(--font-pixel);
+  --font-mono: var(--font-vt);
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+}
+
+/* ===== KOTOBAQUEST 8-BIT RPG PALETTE ===== */
+:root {
+  /* Background layers - dark RPG console feel */
+  --kq-bg: #1a1a2e;
+  --kq-bg-2: #16213e;
+  --kq-bg-3: #0f3460;
+  --kq-fg: #f5f1e8;
+  --kq-fg-dim: #c8c0a8;
+  --kq-muted: #8b8b9d;
+
+  /* Pixel panel colors (cream parchment + NES accents) */
+  --kq-panel: #f5f1e8;
+  --kq-panel-2: #e8e0c8;
+  --kq-panel-border: #1a1a2e;
+  --kq-panel-shadow: #4a3a2a;
+
+  /* World theme colors (one per JLPT level) */
+  --kq-hajimari: #4caf50; /* forest green */
+  --kq-hajimari-dark: #2e7d32;
+  --kq-n5: #ffb74d; /* sunset orange - Vassal Kingdom */
+  --kq-n5-dark: #e65100;
+  --kq-n4: #4fc3f7; /* ocean blue - Minato Port */
+  --kq-n4-dark: #01579b;
+  --kq-n3: #9575cd; /* ninja purple - Kage Clan */
+  --kq-n3-dark: #4527a0;
+  --kq-n2: #ef5350; /* citadel red */
+  --kq-n2-dark: #b71c1c;
+  --kq-n1: #ffd54f; /* emperor gold */
+  --kq-n1-dark: #f57f17;
+
+  /* Battle / status colors */
+  --kq-hp: #4caf50;
+  --kq-hp-low: #ef5350;
+  --kq-mp: #4fc3f7;
+  --kq-xp: #ffd54f;
+
+  /* Action colors */
+  --kq-attack: #ef5350;
+  --kq-correct: #66bb6a;
+  --kq-wrong: #ef5350;
+  --kq-accent: #ffd54f;
+}
+
+/* ===== BASE STYLING ===== */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--kq-bg);
+  color: var(--kq-fg);
+  font-family: var(--font-gothic), "DotGothic16", system-ui, sans-serif;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: pixelated;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0.02em;
+  overflow-x: hidden;
+}
+
+/* Scrollbars - retro styled */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--kq-bg-2);
+  border: 2px solid var(--kq-panel-border);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--kq-muted);
+  border: 2px solid var(--kq-panel-border);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--kq-accent);
+}
+
+/* Selection */
+::selection {
+  background: var(--kq-accent);
+  color: var(--kq-panel-border);
+}
+
+/* ===== PIXEL UTILITIES ===== */
+.font-pixel {
+  font-family: var(--font-pixel), "Press Start 2P", monospace;
+  letter-spacing: 0.05em;
+}
+.font-gothic {
+  font-family: var(--font-gothic), "DotGothic16", sans-serif;
+}
+.font-vt {
+  font-family: var(--font-vt), "VT323", monospace;
+}
+
+/* Pixelated rendering for images & sprites */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* ===== 8-BIT PANEL BORDER (Box-shadow technique) ===== */
+/* Creates that classic thick-bordered game window look */
+.kq-panel {
+  background: var(--kq-panel);
+  color: var(--kq-panel-border);
+  border: 4px solid var(--kq-panel-border);
+  position: relative;
+  box-shadow:
+    0 0 0 4px var(--kq-panel),
+    0 0 0 8px var(--kq-panel-border),
+    8px 8px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+.kq-panel-dark {
+  background: var(--kq-bg-2);
+  color: var(--kq-fg);
+  border: 4px solid var(--kq-fg);
+  position: relative;
+  box-shadow:
+    0 0 0 4px var(--kq-bg-2),
+    0 0 0 8px var(--kq-fg),
+    6px 6px 0 0 rgba(0, 0, 0, 0.5);
+}
+
+.kq-panel-accent {
+  background: var(--kq-accent);
+  color: var(--kq-panel-border);
+  border: 4px solid var(--kq-panel-border);
+  position: relative;
+  box-shadow:
+    0 0 0 4px var(--kq-accent),
+    0 0 0 8px var(--kq-panel-border);
+}
+
+/* ===== PIXEL BUTTON ===== */
+.kq-btn {
+  font-family: var(--font-pixel), "Press Start 2P", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  background: var(--kq-panel);
+  color: var(--kq-panel-border);
+  border: 3px solid var(--kq-panel-border);
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.08s, box-shadow 0.08s;
+  box-shadow:
+    0 0 0 3px var(--kq-panel),
+    0 0 0 6px var(--kq-panel-border),
+    4px 4px 0 0 rgba(0, 0, 0, 0.4);
+  text-transform: uppercase;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.kq-btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow:
+    0 0 0 3px var(--kq-panel),
+    0 0 0 6px var(--kq-panel-border),
+    6px 6px 0 0 rgba(0, 0, 0, 0.5);
+}
+.kq-btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow:
+    0 0 0 3px var(--kq-panel),
+    0 0 0 6px var(--kq-panel-border),
+    1px 1px 0 0 rgba(0, 0, 0, 0.4);
+}
+.kq-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.kq-btn-accent {
+  background: var(--kq-accent);
+  color: var(--kq-panel-border);
+  box-shadow:
+    0 0 0 3px var(--kq-accent),
+    0 0 0 6px var(--kq-panel-border),
+    4px 4px 0 0 rgba(0, 0, 0, 0.4);
+}
+.kq-btn-accent:hover:not(:disabled) {
+  box-shadow:
+    0 0 0 3px var(--kq-accent),
+    0 0 0 6px var(--kq-panel-border),
+    6px 6px 0 0 rgba(0, 0, 0, 0.5);
+}
+.kq-btn-danger {
+  background: var(--kq-attack);
+  color: var(--kq-panel);
+  box-shadow:
+    0 0 0 3px var(--kq-attack),
+    0 0 0 6px var(--kq-panel-border),
+    4px 4px 0 0 rgba(0, 0, 0, 0.4);
+}
+.kq-btn-success {
+  background: var(--kq-correct);
+  color: var(--kq-panel-border);
+  box-shadow:
+    0 0 0 3px var(--kq-correct),
+    0 0 0 6px var(--kq-panel-border),
+    4px 4px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ===== SCANLINE / CRT OVERLAY ===== */
+.kq-crt::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.15) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes kq-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.kq-blink {
+  animation: kq-blink 1s steps(1) infinite;
+}
+
+@keyframes kq-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+.kq-shake {
+  animation: kq-shake 0.4s steps(2) 1;
+}
+
+@keyframes kq-flash-red {
+  0%, 100% { filter: none; }
+  50% { filter: brightness(2) sepia(1) hue-rotate(-50deg) saturate(5); }
+}
+.kq-flash-red {
+  animation: kq-flash-red 0.3s steps(2) 1;
+}
+
+@keyframes kq-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.kq-float {
+  animation: kq-float 2s ease-in-out infinite;
+}
+
+@keyframes kq-bob {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-4px) rotate(1deg); }
+}
+.kq-bob {
+  animation: kq-bob 1.4s ease-in-out infinite;
+}
+
+@keyframes kq-slash {
+  0% { transform: translateX(-100%) rotate(-30deg); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translateX(100%) rotate(-30deg); opacity: 0; }
+}
+.kq-slash {
+  animation: kq-slash 0.4s steps(4) 1;
+}
+
+@keyframes kq-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.kq-fade-in {
+  animation: kq-fade-in 0.4s ease-out 1;
+}
+
+@keyframes kq-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.kq-pop {
+  animation: kq-pop 0.3s ease-out 1;
+}
+
+@keyframes kq-damage {
+  0% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-20px) scale(1.4); opacity: 1; color: var(--kq-attack); }
+  100% { transform: translateY(-40px) scale(1); opacity: 0; }
+}
+.kq-damage-float {
+  animation: kq-damage 0.8s ease-out 1;
+}
+
+@keyframes kq-rainbow {
+  0% { color: #ef5350; }
+  20% { color: #ffd54f; }
+  40% { color: #66bb6a; }
+  60% { color: #4fc3f7; }
+  80% { color: #9575cd; }
+  100% { color: #ef5350; }
+}
+.kq-rainbow {
+  animation: kq-rainbow 2s linear infinite;
+}
+
+@keyframes kq-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--kq-accent); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}
+.kq-pulse-glow {
+  animation: kq-pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* ===== HP/MP/XP BARS ===== */
+.kq-bar {
+  position: relative;
+  background: var(--kq-panel-border);
+  border: 2px solid var(--kq-panel-border);
+  height: 14px;
+  overflow: hidden;
+}
+.kq-bar-fill {
+  height: 100%;
+  transition: width 0.4s steps(20);
+  position: relative;
+}
+.kq-bar-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.2) 0,
+    rgba(255, 255, 255, 0.2) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* ===== DECORATIVE PIXEL GRID BACKGROUND ===== */
+.kq-grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ===== STARFIELD / DOTS BG ===== */
+.kq-dots-bg {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* ===== TEXT OUTLINE FOR PIXEL SPRITE-LIKE TEXT ===== */
+.kq-text-outline {
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000,
+    0 2px 0 #000;
+}
+
+.kq-text-outline-sm {
+  text-shadow:
+    -1px 0 0 #000,
+    1px 0 0 #000,
+    0 -1px 0 #000,
+    0 1px 0 #000;
+}
+
+/* ===== DIALOGUE ARROW ===== */
+.kq-arrow-down::after {
+  content: "▼";
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  color: var(--kq-panel-border);
+  animation: kq-blink 1s steps(1) infinite;
+  font-size: 0.7rem;
+}
+
+/* ===== DISABLE NATIVE LOOKS ===== */
+button {
+  font-family: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+}
+input,
+textarea {
+  font-family: inherit;
+}
