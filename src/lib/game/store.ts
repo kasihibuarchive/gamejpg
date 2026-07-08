@@ -68,6 +68,10 @@ interface GameState {
   recordBossDefeat: () => void;
   recordPerfectStage: () => void;
   recordItemUsed: () => void;
+
+  // Difficulty
+  setDifficulty: (d: "easy" | "normal" | "hard") => void;
+  recordStageLoss: (stageId: string) => void;
 }
 
 const INITIAL_PLAYER: PlayerState = {
@@ -77,13 +81,15 @@ const INITIAL_PLAYER: PlayerState = {
   xpToNext: 100,
   hp: 20,
   maxHp: 20,
-  coins: 50, // starting coins
+  coins: 50,
   badges: [],
   items: [],
   itemCounts: {},
   completedStages: [],
   unlockedWorlds: ["hajimari"],
   achievements: [],
+  difficulty: "normal",
+  stageLosses: {},
 };
 
 const INITIAL_STATS: GameStats = {
@@ -283,6 +289,23 @@ export const useGame = create<GameState>()(
         stats.totalItemsUsed += 1;
         set({ stats });
       },
+
+      setDifficulty: (d) => {
+        const player = { ...get().player, difficulty: d };
+        set({ player });
+      },
+
+      recordStageLoss: (stageId) => {
+        const player = { ...get().player };
+        player.stageLosses = { ...player.stageLosses };
+        player.stageLosses[stageId] = (player.stageLosses[stageId] || 0) + 1;
+        // Mercy: heal player 30% on 3rd loss to avoid frustration
+        if (player.stageLosses[stageId] >= 3) {
+          player.hp = Math.min(player.maxHp, player.hp + Math.floor(player.maxHp * 0.3));
+          player.stageLosses[stageId] = 0; // reset
+        }
+        set({ player });
+      },
     }),
     {
       name: "kotobaquest-save-v2",
@@ -292,12 +315,11 @@ export const useGame = create<GameState>()(
         soundEnabled: s.soundEnabled,
         crtEnabled: s.crtEnabled,
       }),
-      version: 2,
-      // Migrate from v1 - if old save exists, reset stats & add coins
+      version: 3,
+      // Migrate from older versions
       migrate: (persisted: any, version: number) => {
         if (!persisted) return persisted;
         if (version < 2) {
-          // Old save format - add new fields with defaults
           if (persisted.player) {
             persisted.player.coins = persisted.player.coins ?? 50;
             persisted.player.itemCounts = persisted.player.itemCounts ?? {};
@@ -305,6 +327,13 @@ export const useGame = create<GameState>()(
           }
           if (!persisted.stats) {
             persisted.stats = { ...INITIAL_STATS, lastPlayedDate: new Date().toDateString() };
+          }
+        }
+        if (version < 3) {
+          // v3: add difficulty & stageLosses
+          if (persisted.player) {
+            persisted.player.difficulty = persisted.player.difficulty ?? "normal";
+            persisted.player.stageLosses = persisted.player.stageLosses ?? {};
           }
         }
         return persisted;

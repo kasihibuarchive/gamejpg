@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useGame } from "@/lib/game/store";
 import { getStage } from "@/lib/game/stages";
 import { getWorld } from "@/lib/game/worlds";
 import { ITEMS, getItem } from "@/lib/game/items";
 import { getEnemySprite, getHeroSprite } from "@/lib/game/sprites";
+import { scaleEnemy, processEnemyTurn, computePlayerDamage, ABILITY_INFO } from "@/lib/game/enemy-ai";
+import { getBattleQuestions } from "@/lib/game/question-randomizer";
+import { DIFFICULTY } from "@/lib/game/types";
 import { PixelButton, PixelPanel, PixelSprite, StatBar } from "./PixelUI";
 import { audio } from "@/lib/game/audio";
 import type { Question } from "@/lib/game/types";
@@ -22,6 +25,17 @@ interface BattleState {
   isCritical: boolean;
   // Shield (blocks next enemy hit)
   shieldActive: boolean;
+  // Enemy shield (blocks player's next hit)
+  enemyShieldActive: boolean;
+  // Poison (player DOT)
+  poisonTurns: number;
+  // Enrage flag
+  enemyEnraged: boolean;
+  // Turn counter
+  turnNumber: number;
+  // Timer
+  timeRemaining: number;
+  timerActive: boolean;
   // animation flags
   enemyShake: boolean;
   enemyFlashRed: boolean;
@@ -30,6 +44,7 @@ interface BattleState {
   enemyDamageText: string | null;
   playerDamageText: string | null;
   comboText: string | null;
+  enemyActionText: string | null;
   // status message (above question)
   statusMessage: string;
   // answer feedback
@@ -55,6 +70,7 @@ export function BattleScreen() {
     consumeItem,
     hasItem,
     recordAnswer,
+    recordStageLoss,
     player,
     stats,
   } = useGame();
@@ -62,9 +78,29 @@ export function BattleScreen() {
   const stage = selectedStageId ? getStage(selectedStageId) : null;
   const world = stage ? getWorld(stage.worldId) : null;
 
+  // Scale enemy based on player level & difficulty
+  const scaledEnemy = useMemo(() => {
+    if (!stage || !stage.enemies[0]) return null;
+    return scaleEnemy(
+      stage.enemies[0],
+      player.level,
+      stage.index,
+      player.difficulty,
+    );
+  }, [stage, player.level, player.difficulty]);
+
+  // Get randomized questions for this battle (memoized per stage)
+  const battleQuestions = useMemo(() => {
+    if (!stage) return [];
+    return getBattleQuestions(stage);
+  }, [stage]);
+
+  const difficultyCfg = DIFFICULTY[player.difficulty];
+  const baseTimer = difficultyCfg.baseTimer - (scaledEnemy?.abilities?.includes("time-pressure") ? 5 : 0);
+
   const [state, setState] = useState<BattleState>({
-    enemyHp: stage?.enemies[0]?.hp ?? 1,
-    enemyMaxHp: stage?.enemies[0]?.hp ?? 1,
+    enemyHp: scaledEnemy?.scaledHp ?? 1,
+    enemyMaxHp: scaledEnemy?.scaledHp ?? 1,
     playerHp: player.hp,
     questionIdx: 0,
     totalCorrect: 0,
@@ -72,12 +108,19 @@ export function BattleScreen() {
     bestCombo: 0,
     isCritical: false,
     shieldActive: false,
+    enemyShieldActive: false,
+    poisonTurns: 0,
+    enemyEnraged: false,
+    turnNumber: 0,
+    timeRemaining: baseTimer,
+    timerActive: true,
     enemyShake: false,
     enemyFlashRed: false,
     playerShake: false,
     enemyDamageText: null,
     playerDamageText: null,
     comboText: null,
+    enemyActionText: null,
     statusMessage: "Pertarungan dimulai! Jawab dengan benar untuk menyerang!",
     lastAnswerCorrect: null,
     battleEnded: false,
@@ -98,6 +141,7 @@ export function BattleScreen() {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const questionAreaRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Start music
   useEffect(() => {
@@ -115,8 +159,8 @@ export function BattleScreen() {
     }
   }, [stage?.id, player.hp]);
 
-  const currentEnemy = stage?.enemies[0];
-  const currentQuestion: Question | undefined = stage?.questions[state.questionIdx];
+  const currentEnemy = scaledEnemy;
+  const currentQuestion: Question | undefined = battleQuestions[state.questionIdx];
 
   // Focus input when typing question shows
   useEffect(() => {
@@ -151,13 +195,15 @@ export function BattleScreen() {
       audio.victory();
     } else {
       audio.gameOver();
+      // Record loss for mercy mechanic
+      if (stage) recordStageLoss(stage.id);
     }
 
     // Compute rewards
     const baseXp = stage?.reward.xp ?? 0;
     const xpGained = victory ? baseXp : Math.floor(baseXp * 0.1);
     // Coins: stage rewards give coins = xp/2 + bonus for perfect
-    const perfect = victory && totalCorrect === stage?.questions.length;
+    const perfect = victory && totalCorrect === battleQuestions.length;
     const baseCoins = victory
       ? Math.floor(baseXp / 3) + (perfect ? 30 : 0) + bestCombo * 5
       : 5;
@@ -204,7 +250,7 @@ export function BattleScreen() {
       xpGained,
       coinsGained: baseCoins,
       correctCount: totalCorrect,
-      totalCount: stage?.questions.length ?? 0,
+      totalCount: battleQuestions.length,
       bestCombo,
       itemsGained,
       badgesGained,
@@ -247,35 +293,128 @@ export function BattleScreen() {
     state.bestCombo,
   ]);
 
+  // ===== TIMER SYSTEM =====
+  // Use a ref to call handleAnswer from timer effect without circular dep
+  const handleAnswerRef = useRef<(isCorrect: boolean, isTimeout?: boolean) => void>(() => {});
+
+  // Timer interval - runs continuously, but only ticks down when active
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setState((s) => {
+        // Only tick if timer active, battle not ended, and no answer pending
+        if (!s.timerActive || s.battleEnded || s.lastAnswerCorrect !== null) return s;
+        const newTime = s.timeRemaining - 0.1;
+        if (newTime <= 0) {
+          return { ...s, timeRemaining: 0, timerActive: false };
+        }
+        return { ...s, timeRemaining: newTime };
+      });
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Handle timer hitting 0 (timeout = wrong answer)
+  useEffect(() => {
+    if (
+      state.timeRemaining <= 0 &&
+      !state.battleEnded &&
+      state.lastAnswerCorrect === null &&
+      state.timerActive === false
+    ) {
+      // Trigger wrong answer due to timeout via ref
+      handleAnswerRef.current(false, true);
+    }
+  }, [state.timeRemaining, state.battleEnded, state.lastAnswerCorrect, state.timerActive]);
+
   const handleAnswer = useCallback(
-    (isCorrect: boolean) => {
+    (isCorrect: boolean, isTimeout = false) => {
       if (state.battleEnded) return;
+      if (state.lastAnswerCorrect !== null) return; // already answered
       setShowHint(false);
       setMatchedPairs([]);
       setSelectedMatch(null);
 
       const enemy = currentEnemy!;
-      // Base damage = enemy.hp / totalQuestions so all-correct = death
-      const baseDmg = Math.ceil(enemy.hp / stage!.questions.length);
+      const numQuestions = battleQuestions.length;
+      // Base damage = scaledEnemy.hp / totalQuestions so all-correct = death
+      const baseDmg = Math.ceil(enemy.scaledHp / numQuestions);
       // Combo system: every consecutive correct adds +1 damage
       const newCombo = isCorrect ? state.combo + 1 : 0;
-      const comboBonus = isCorrect ? Math.min(newCombo - 1, 5) : 0; // up to +5 bonus
+
       // Critical hit: 15% chance, doubles damage
       const isCrit = isCorrect && Math.random() < 0.15;
-      const critMult = isCrit ? 2 : 1;
-      const dmgToEnemy = isCorrect
-        ? (baseDmg + comboBonus) * critMult
-        : 0;
 
-      // Shield blocks enemy damage
+      // Compute player damage with timing bonus
+      const timeRemaining = state.timeRemaining;
+      const { damage: dmgToEnemy, isFast, isSlow } = isCorrect
+        ? computePlayerDamage(
+            baseDmg,
+            newCombo - 1, // combo bonus applied inside
+            isCrit,
+            timeRemaining,
+            baseTimer,
+            player.difficulty,
+          )
+        : { damage: 0, isFast: false, isSlow: false };
+
+      // Process enemy turn (abilities trigger)
+      const enemyTurn = processEnemyTurn(
+        enemy,
+        state.enemyHp,
+        state.enemyMaxHp,
+        state.turnNumber + 1,
+        player.difficulty,
+        !isCorrect,
+      );
+
+      // Apply enemy heal
+      let actualEnemyHp = state.enemyHp;
+      if (enemyTurn.healAmount) {
+        actualEnemyHp = Math.min(state.enemyMaxHp, state.enemyHp + enemyTurn.healAmount);
+      }
+      if (enemyTurn.regenAmount) {
+        actualEnemyHp = Math.min(state.enemyMaxHp, actualEnemyHp + enemyTurn.regenAmount);
+      }
+      // Apply enemy damage (player's hit)
+      let dmgAfterEnemyHeal = Math.max(0, actualEnemyHp - dmgToEnemy);
+      // Enemy shield blocks player's hit
+      const enemyShieldBlocked = state.enemyShieldActive && isCorrect;
+      if (enemyShieldBlocked) {
+        // Player's attack blocked - reset enemy shield
+      }
+
+      // Shield blocks enemy damage to player
       const shieldBlocked = state.shieldActive && !isCorrect;
-      const dmgToPlayer =
-        !isCorrect && !shieldBlocked ? enemy.attack : 0;
+      let dmgToPlayer = enemyTurn.damageToPlayer ?? 0;
+      if (shieldBlocked) dmgToPlayer = 0;
+      // Counter damage (when player answers correctly)
+      const counterDmg = enemyTurn.counterDamage ?? 0;
+
+      // Poison: apply if enemy used poison
+      const newPoisonTurns = enemyTurn.poisonApplied ? 2 : Math.max(0, state.poisonTurns - 1);
+      // Poison ticks for 1 HP per turn
+      const poisonDmg = newPoisonTurns > 0 ? 1 : 0;
+      const totalPlayerDmg = dmgToPlayer + counterDmg + poisonDmg;
 
       // Update stats tracking
       recordAnswer(isCorrect);
-      if (isCorrect && newCombo > state.bestCombo) {
-        // best combo tracked in state
+
+      const finalEnemyHp = enemyShieldBlocked ? actualEnemyHp : dmgAfterEnemyHeal;
+
+      // Build status messages
+      let statusMsg = "";
+      if (isCorrect) {
+        if (isCrit) statusMsg = `💥 CRITICAL HIT! ${newCombo}x combo!`;
+        else if (isFast) statusMsg = `⚡ FAST! ${newCombo}x combo! (+${Math.round((isCorrect ? 1.8 : 1) * 100 - 100)}% dmg)`;
+        else if (newCombo >= 2) statusMsg = `✓ Benar! Combo ${newCombo}x!`;
+        else statusMsg = "✓ Benar! Serangan mengenai musuh!";
+        if (enemyShieldBlocked) statusMsg = "🛡 Seranganmu diblokir perisai musuh!";
+      } else if (isTimeout) {
+        statusMsg = "⏱ Waktu habis! Musuh menyerang!";
+      } else if (shieldBlocked) {
+        statusMsg = "🛡 Perisai memblokir serangan musuh!";
+      } else {
+        statusMsg = "✗ Salah! Musuh membalas!";
       }
 
       setState((s) => ({
@@ -285,24 +424,22 @@ export function BattleScreen() {
         combo: newCombo,
         bestCombo: Math.max(s.bestCombo, newCombo),
         isCritical: isCrit,
-        enemyHp: Math.max(0, s.enemyHp - dmgToEnemy),
-        playerHp: Math.max(0, s.playerHp - dmgToPlayer),
+        enemyHp: finalEnemyHp,
+        playerHp: Math.max(0, s.playerHp - totalPlayerDmg),
         shieldActive: shieldBlocked ? false : s.shieldActive,
-        enemyShake: isCorrect,
-        enemyFlashRed: isCorrect,
-        playerShake: !isCorrect && !shieldBlocked,
-        enemyDamageText: null, // will be set by showFloatingDamage
+        enemyShieldActive: enemyTurn.shieldGained ? true : (enemyShieldBlocked ? false : s.enemyShieldActive),
+        poisonTurns: newPoisonTurns,
+        enemyEnraged: enemyTurn.enraged ?? s.enemyEnraged,
+        turnNumber: s.turnNumber + 1,
+        timerActive: false,
+        enemyShake: isCorrect && !enemyShieldBlocked,
+        enemyFlashRed: isCorrect && !enemyShieldBlocked,
+        playerShake: !isCorrect || counterDmg > 0 || poisonDmg > 0,
+        enemyDamageText: null,
         playerDamageText: null,
         comboText: isCorrect && newCombo >= 2 ? `${newCombo}x COMBO!` : null,
-        statusMessage: isCorrect
-          ? isCrit
-            ? `💥 CRITICAL HIT! Combo ${newCombo}x!`
-            : newCombo >= 2
-              ? `✓ Benar! Combo ${newCombo}x!`
-              : "✓ Benar! Serangan mengenai musuh!"
-          : shieldBlocked
-            ? "🛡 Perisai memblokir serangan!"
-            : "✗ Salah! Musuh membalas!",
+        enemyActionText: enemyTurn.messages.length > 0 ? enemyTurn.messages[0] : null,
+        statusMessage: statusMsg,
       }));
 
       // Sounds & effects
@@ -317,27 +454,27 @@ export function BattleScreen() {
           setTimeout(() => audio.attack(), 200);
           setTimeout(() => audio.enemyHit(), 400);
         }
-        showFloatingDamage("enemy", dmgToEnemy, isCrit);
+        if (!enemyShieldBlocked) {
+          showFloatingDamage("enemy", dmgToEnemy, isCrit);
+        }
       } else {
         if (shieldBlocked) {
           audio.click();
         } else {
           audio.wrong();
           setTimeout(() => audio.playerHit(), 300);
-          showFloatingDamage("player", dmgToPlayer);
+          showFloatingDamage("player", totalPlayerDmg);
         }
       }
 
-      // Clear combo text after a moment
-      if (isCorrect && newCombo >= 2) {
-        setTimeout(() => {
-          setState((s) => ({ ...s, comboText: null }));
-        }, 1200);
-      }
+      // Clear combo text & enemy action text after a moment
+      setTimeout(() => {
+        setState((s) => ({ ...s, comboText: null, enemyActionText: null }));
+      }, 1500);
 
       // Sync store player HP
-      if (!isCorrect && !shieldBlocked) {
-        damagePlayer(dmgToPlayer);
+      if (totalPlayerDmg > 0) {
+        damagePlayer(totalPlayerDmg);
       }
 
       // Clear animation flags
@@ -354,38 +491,60 @@ export function BattleScreen() {
       // Advance question after delay
       setTimeout(() => {
         setState((s) => {
-          const isLastQuestion =
-            s.questionIdx >= stage!.questions.length - 1;
+          const isLastQuestion = s.questionIdx >= battleQuestions.length - 1;
 
           if (s.enemyHp <= 0) return s;
           if (s.playerHp <= 0) return s;
-          if (isLastQuestion) return s;
+          // If last question answered but enemy still alive, player loses
+          // (out of ammo - must defeat enemy within question limit)
+          if (isLastQuestion) {
+            // Set player HP to 0 to trigger defeat
+            return { ...s, playerHp: 0 };
+          }
 
           return {
             ...s,
             questionIdx: s.questionIdx + 1,
             statusMessage: "Pertanyaan berikutnya!",
             lastAnswerCorrect: null,
+            timeRemaining: baseTimer,
+            timerActive: true,
           };
         });
 
         setTypedAnswer("");
         setSelectedChoice(null);
         setShowHint(false);
-      }, 1700);
+      }, 1900);
     },
     [
       state.battleEnded,
       state.combo,
       state.bestCombo,
       state.shieldActive,
+      state.enemyShieldActive,
+      state.poisonTurns,
+      state.enemyHp,
+      state.enemyMaxHp,
+      state.turnNumber,
+      state.timeRemaining,
+      state.lastAnswerCorrect,
       currentEnemy,
       stage,
+      battleQuestions,
+      baseTimer,
+      player.difficulty,
       damagePlayer,
       showFloatingDamage,
       recordAnswer,
+      recordStageLoss,
     ],
   );
+
+  // Keep ref in sync with latest handleAnswer
+  useEffect(() => {
+    handleAnswerRef.current = handleAnswer;
+  }, [handleAnswer]);
 
   // Handle choice selection
   const handleChoice = (idx: number) => {
@@ -682,8 +841,8 @@ export function BattleScreen() {
                     audio.click();
                     endedRef.current = false;
                     setState({
-                      enemyHp: stage?.enemies[0]?.hp ?? 1,
-                      enemyMaxHp: stage?.enemies[0]?.hp ?? 1,
+                      enemyHp: scaledEnemy?.scaledHp ?? 1,
+                      enemyMaxHp: scaledEnemy?.scaledHp ?? 1,
                       playerHp: player.hp,
                       questionIdx: 0,
                       totalCorrect: 0,
@@ -691,12 +850,19 @@ export function BattleScreen() {
                       bestCombo: 0,
                       isCritical: false,
                       shieldActive: false,
+                      enemyShieldActive: false,
+                      poisonTurns: 0,
+                      enemyEnraged: false,
+                      turnNumber: 0,
+                      timeRemaining: baseTimer,
+                      timerActive: true,
                       enemyShake: false,
                       enemyFlashRed: false,
                       playerShake: false,
                       enemyDamageText: null,
                       playerDamageText: null,
                       comboText: null,
+                      enemyActionText: null,
                       statusMessage: "Coba lagi! Semangat!",
                       lastAnswerCorrect: null,
                       battleEnded: false,
@@ -770,9 +936,116 @@ export function BattleScreen() {
             className="font-pixel text-[0.55rem]"
             style={{ color: "var(--kq-accent)" }}
           >
-            Q {state.questionIdx + 1}/{stage.questions.length}
+            Q {state.questionIdx + 1}/{battleQuestions.length}
           </div>
         </div>
+
+        {/* Timer bar - above battle stage */}
+        <div className="mb-2 flex items-center gap-2">
+          <span className="font-pixel text-[0.5rem] text-white/80 shrink-0">⏱</span>
+          <div
+            className="flex-1 h-3 relative overflow-hidden"
+            style={{
+              background: "var(--kq-bg-2)",
+              border: "2px solid var(--kq-fg)",
+            }}
+          >
+            <div
+              style={{
+                width: `${(state.timeRemaining / baseTimer) * 100}%`,
+                height: "100%",
+                background:
+                  state.timeRemaining / baseTimer > 0.5
+                    ? "var(--kq-correct)"
+                    : state.timeRemaining / baseTimer > 0.25
+                      ? "var(--kq-accent)"
+                      : "var(--kq-attack)",
+                transition: "width 0.1s linear",
+              }}
+            />
+          </div>
+          <span
+            className="font-pixel text-[0.55rem] shrink-0 w-12 text-right"
+            style={{
+              color:
+                state.timeRemaining / baseTimer > 0.5
+                  ? "var(--kq-correct)"
+                  : state.timeRemaining / baseTimer > 0.25
+                    ? "var(--kq-accent)"
+                    : "var(--kq-attack)",
+            }}
+          >
+            {Math.ceil(state.timeRemaining)}s
+          </span>
+        </div>
+
+        {/* Enemy ability indicators */}
+        {currentEnemy.abilities && currentEnemy.abilities.length > 0 && (
+          <div className="mb-2 flex items-center gap-1 flex-wrap">
+            <span className="font-pixel text-[0.4rem] text-white/60 shrink-0">
+              ABILITY:
+            </span>
+            {currentEnemy.abilities.map((ab) => {
+              const info = ABILITY_INFO[ab];
+              if (!info) return null;
+              return (
+                <span
+                  key={ab}
+                  className="font-pixel text-[0.4rem] px-1.5 py-0.5"
+                  style={{
+                    background: info.color,
+                    color: "white",
+                    border: `2px solid var(--kq-panel-border)`,
+                    textShadow: "1px 1px 0 rgba(0,0,0,0.6)",
+                  }}
+                  title={info.description}
+                >
+                  {info.icon} {info.name}
+                </span>
+              );
+            })}
+            {state.enemyEnraged && (
+              <span
+                className="font-pixel text-[0.4rem] px-1.5 py-0.5 kq-blink"
+                style={{
+                  background: "var(--kq-attack)",
+                  color: "white",
+                  border: "2px solid var(--kq-panel-border)",
+                }}
+              >
+                🔥 ENRAGED!
+              </span>
+            )}
+            {state.enemyShieldActive && (
+              <span
+                className="font-pixel text-[0.4rem] px-1.5 py-0.5"
+                style={{
+                  background: "var(--kq-n4)",
+                  color: "white",
+                  border: "2px solid var(--kq-panel-border)",
+                }}
+              >
+                🛡 SHIELDED
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Enemy action announcement (when enemy uses ability) */}
+        {state.enemyActionText && (
+          <div className="mb-2 text-center">
+            <span
+              className="font-pixel text-[0.55rem] inline-block px-3 py-1 kq-pop"
+              style={{
+                background: "var(--kq-attack)",
+                color: "white",
+                border: "2px solid var(--kq-panel-border)",
+              }}
+            >
+              {state.enemyActionText}
+            </span>
+          </div>
+        )}
 
         {/* Battle stage - enemy at top, player at bottom */}
         <div

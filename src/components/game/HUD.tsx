@@ -12,6 +12,7 @@ export function HUD() {
     toggleSound,
     toggleCrt,
     setView,
+    setDifficulty,
     view,
   } = useGame();
 
@@ -219,6 +220,43 @@ export function HUD() {
           >
             <span className="font-pixel text-[0.5rem]">📺</span>
           </button>
+          {/* Difficulty selector */}
+          <div
+            className="flex items-center"
+            style={{
+              background: "var(--kq-bg-3)",
+              border: "2px solid var(--kq-fg)",
+            }}
+          >
+            {(["easy", "normal", "hard"] as const).map((d) => (
+              <button
+                key={d}
+                onClick={() => {
+                  audio.click();
+                  setDifficulty(d);
+                }}
+                className="px-2 py-2"
+                style={{
+                  background:
+                    player.difficulty === d
+                      ? d === "easy"
+                        ? "var(--kq-correct)"
+                        : d === "normal"
+                          ? "var(--kq-accent)"
+                          : "var(--kq-attack)"
+                      : "transparent",
+                  color:
+                    player.difficulty === d ? "black" : "var(--kq-fg)",
+                }}
+                aria-label={`Difficulty: ${d}`}
+                title={`Difficulty: ${d}`}
+              >
+                <span className="font-pixel text-[0.45rem] uppercase">
+                  {d === "easy" ? "EZ" : d === "normal" ? "NM" : "HD"}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </header>

@@ -49,6 +49,7 @@ export const KATAKANA_STAGES: Stage[] = [
         attack: 2,
         description: "Bayangan cermin yang memantulkan kata.",
         color: "#b0bec5",
+        abilities: ["counter"],
       },
     ],
     questions: [
@@ -134,6 +135,7 @@ export const KATAKANA_STAGES: Stage[] = [
         hp: 6,
         attack: 3,
         color: "#ef5350",
+        abilities: ["enrage", "multi-attack"],
       },
     ],
     questions: [
@@ -223,6 +225,8 @@ export const KATAKANA_STAGES: Stage[] = [
         hp: 7,
         attack: 3,
         color: "#7e57c2",
+        abilities: ["poison", "crit"],
+        critChance: 0.15,
       },
     ],
     questions: [
@@ -315,6 +319,7 @@ export const KATAKANA_STAGES: Stage[] = [
         hp: 8,
         attack: 4,
         color: "#ffa726",
+        abilities: ["multi-attack", "shield"],
       },
     ],
     questions: [
@@ -403,6 +408,7 @@ export const KATAKANA_STAGES: Stage[] = [
         attack: 4,
         description: "Mini-boss: ujian 15 huruf Katakana.",
         color: "#90a4ae",
+        abilities: ["shield", "counter", "enrage"],
       },
     ],
     questions: [
@@ -579,6 +585,7 @@ export const KATAKANA_STAGES: Stage[] = [
         hp: 9,
         attack: 4,
         color: "#795548",
+        abilities: ["shield", "multi-attack"],
       },
     ],
     questions: [
@@ -662,6 +669,7 @@ export const KATAKANA_STAGES: Stage[] = [
         hp: 10,
         attack: 4,
         color: "#cfd8dc",
+        abilities: ["multi-attack", "regen"],
       },
     ],
     questions: [
@@ -745,6 +753,8 @@ export const KATAKANA_STAGES: Stage[] = [
         hp: 11,
         attack: 5,
         color: "#b39ddb",
+        abilities: ["poison", "crit", "counter"],
+        critChance: 0.2,
       },
     ],
     questions: [
@@ -839,6 +849,8 @@ export const KATAKANA_STAGES: Stage[] = [
         attack: 5,
         description: "Bos akhir Bab 2. Wujud bayangan semua kata asing yang tak dipelajari.",
         color: "#7c4dff",
+        abilities: ["enrage", "heal", "crit", "shield", "multi-attack", "poison", "counter"],
+        critChance: 0.2,
       },
     ],
     questions: [

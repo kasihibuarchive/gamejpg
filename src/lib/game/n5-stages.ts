@@ -52,6 +52,7 @@ export const N5_STAGES: Stage[] = [
         attack: 2,
         description: "Tidak bisa menyapa dengan benar.",
         color: "#8d6e63",
+        abilities: ["regen"],
       },
     ],
     questions: [
@@ -133,6 +134,7 @@ export const N5_STAGES: Stage[] = [
         hp: 6,
         attack: 3,
         color: "#9c27b0",
+        abilities: ["multi-attack", "poison"],
       },
     ],
     questions: [
@@ -211,6 +213,8 @@ export const N5_STAGES: Stage[] = [
         hp: 7,
         attack: 3,
         color: "#76ff03",
+        abilities: ["multi-attack", "crit"],
+        critChance: 0.15,
       },
     ],
     questions: [
@@ -296,6 +300,7 @@ export const N5_STAGES: Stage[] = [
         hp: 8,
         attack: 4,
         color: "#ff9800",
+        abilities: ["poison", "time-pressure"],
       },
     ],
     questions: [
@@ -384,6 +389,7 @@ export const N5_STAGES: Stage[] = [
         attack: 5,
         description: "Mini-boss: ujian hari & bulan.",
         color: "#cddc39",
+        abilities: ["time-pressure", "shield", "enrage"],
       },
     ],
     questions: [
@@ -481,6 +487,7 @@ export const N5_STAGES: Stage[] = [
         hp: 9,
         attack: 4,
         color: "#3f51b5",
+        abilities: ["shield", "counter"],
       },
     ],
     questions: [
@@ -572,6 +579,7 @@ export const N5_STAGES: Stage[] = [
         hp: 10,
         attack: 4,
         color: "#795548",
+        abilities: ["heal", "shield"],
       },
     ],
     questions: [
@@ -663,6 +671,8 @@ export const N5_STAGES: Stage[] = [
         hp: 11,
         attack: 5,
         color: "#e91e63",
+        abilities: ["multi-attack", "crit"],
+        critChance: 0.2,
       },
     ],
     questions: [
@@ -753,6 +763,7 @@ export const N5_STAGES: Stage[] = [
         hp: 12,
         attack: 5,
         color: "#cfd8dc",
+        abilities: ["poison", "regen", "counter"],
       },
     ],
     questions: [
@@ -842,6 +853,8 @@ export const N5_STAGES: Stage[] = [
         attack: 6,
         description: "Bos akhir N5. Penguasa Vassal Kingdom, ahli bahasa formal.",
         color: "#ff9800",
+        abilities: ["enrage", "heal", "crit", "shield", "multi-attack", "counter"],
+        critChance: 0.2,
       },
     ],
     questions: [

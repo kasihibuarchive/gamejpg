@@ -33,16 +33,78 @@ export interface MatchingQuestion {
 
 export type Question = ChoiceQuestion | TypingQuestion | MatchingQuestion;
 
+// ===== ENEMY ABILITIES =====
+export type EnemyAbility =
+  | "heal" // enemy heals self periodically
+  | "crit" // enemy has chance to crit (2x damage)
+  | "shield" // enemy blocks player's next hit
+  | "multi-attack" // enemy attacks twice on wrong answer
+  | "enrage" // boss: gains attack power below 30% HP
+  | "regen" // enemy regens HP each turn
+  | "poison" // wrong answer poisons player (DOT)
+  | "time-pressure" // reduces player's timer
+  | "counter"; // enemy reflects some damage on correct hits
+
 export interface BattleEnemy {
   id: string;
   name: string;
   nameJp?: string;
-  sprite: string; // emoji or short text used as pixel sprite
+  sprite: string;
   hp: number;
-  attack: number; // damage to player on wrong answer
+  attack: number; // base damage to player on wrong answer
   description?: string;
   color?: string;
+  // New: abilities
+  abilities?: EnemyAbility[];
+  // New: optional level override (default: scaled by stage index & world)
+  level?: number;
+  // New: crit chance (0-1, default 0)
+  critChance?: number;
 }
+
+// ===== DIFFICULTY / SCALING =====
+export interface DifficultyConfig {
+  // Multipliers applied to enemy stats based on player level & stage
+  hpScale: number; // enemy HP = base * (1 + playerLevel * hpScale)
+  atkScale: number; // enemy ATK = base * (1 + playerLevel * atkScale)
+  // Timer settings (seconds per question)
+  baseTimer: number;
+  fastBonus: number; // damage multiplier if answered in first 30% of timer
+  slowPenalty: number; // damage multiplier if answered in last 30%
+  // Enemy crit settings
+  enemyCritChance: number;
+  enemyCritMult: number;
+}
+
+export const DIFFICULTY: Record<"easy" | "normal" | "hard", DifficultyConfig> = {
+  easy: {
+    hpScale: 0.05,
+    atkScale: 0.05,
+    baseTimer: 20,
+    fastBonus: 1.5,
+    slowPenalty: 0.7,
+    enemyCritChance: 0.05,
+    enemyCritMult: 1.5,
+  },
+  normal: {
+    hpScale: 0.1,
+    atkScale: 0.1,
+    baseTimer: 15,
+    fastBonus: 1.8,
+    slowPenalty: 0.5,
+    enemyCritChance: 0.1,
+    enemyCritMult: 2,
+  },
+  hard: {
+    hpScale: 0.15,
+    atkScale: 0.15,
+    baseTimer: 10,
+    fastBonus: 2,
+    slowPenalty: 0.3,
+    enemyCritChance: 0.2,
+    enemyCritMult: 2.5,
+  },
+};
 
 export interface Stage {
   id: string; // e.g. "hajimari-1"
@@ -122,6 +184,9 @@ export interface PlayerState {
   completedStages: string[]; // stage IDs
   unlockedWorlds: WorldId[];
   achievements: string[]; // unlocked achievement IDs
+  difficulty: "easy" | "normal" | "hard";
+  // Anti-frustration: track losses per stage for mercy mechanic
+  stageLosses: Record<string, number>;
 }
 
 // ===== GAME STATS (for achievements) =====

@@ -51,6 +51,7 @@ export const HAJIMARI_STAGES: Stage[] = [
         attack: 1,
         description: "Monster level rendah dari huruf vokal.",
         color: "#66bb6a",
+        abilities: ["regen"],
       },
     ],
     questions: [
@@ -138,6 +139,7 @@ export const HAJIMARI_STAGES: Stage[] = [
         attack: 2,
         description: "Monster rawa dengan deret K.",
         color: "#9575cd",
+        abilities: ["multi-attack"],
       },
     ],
     questions: [
@@ -217,6 +219,8 @@ export const HAJIMARI_STAGES: Stage[] = [
         attack: 2,
         description: "Roh bayangan berbisik.",
         color: "#4fc3f7",
+        abilities: ["crit"],
+        critChance: 0.2,
       },
     ],
     questions: [
@@ -297,6 +301,7 @@ export const HAJIMARI_STAGES: Stage[] = [
         attack: 3,
         description: "Penjaga jalan berotot.",
         color: "#ef5350",
+        abilities: ["enrage"],
       },
     ],
     questions: [
@@ -377,6 +382,7 @@ export const HAJIMARI_STAGES: Stage[] = [
         attack: 3,
         description: "Mini-boss penjaga gerbang desa. Menguji deret vokal, K, S, T.",
         color: "#8b8b9d",
+        abilities: ["shield", "counter"],
       },
     ],
     questions: [
@@ -859,6 +865,8 @@ export const HAJIMARI_STAGES: Stage[] = [
         attack: 5,
         description: "Bos akhir Bab 1. Wujud semua huruf yang dilupakan.",
         color: "#1a1a2e",
+        abilities: ["enrage", "heal", "crit", "shield", "multi-attack"],
+        critChance: 0.15,
       },
     ],
     questions: [

@@ -31,6 +31,18 @@ Petualangan epik mempelajari bahasa Jepang dalam dunia RPG 8-bit yang dikemas mo
 - Review soal dari stage yang sudah selesai
 - Pilih 5/10/20 soal acak, tanpa tekanan HP
 
+### ⚔️ Battle System (Game-Challenging!)
+- **Enemy Scaling**: HP & ATK musuh naik seiring level pemain & stage progress
+- **9 Enemy Abilities**: Heal, Crit, Shield, Multi-Attack, Enrage, Regen, Poison, Time-Pressure, Counter
+- **Timer per Question**: 20s (easy) / 15s (normal) / 10s (hard) - jawab cepat = bonus damage!
+- **Question Randomization**: Urutan soal & opsi jawaban diacak tiap battle
+- **Expanded Question Pool**: Auto-generate soal variasi dari lesson content
+- **Critical Hits**: 15% peluang damage 2x untuk pemain, musuh juga bisa crit
+- **Boss Phases**: Boss mengamuk (enrage) di bawah 30% HP, +50% damage
+- **Combo System**: Streak jawaban benar = damage bonus (max +50%)
+- **3 Difficulty Modes**: Easy / Normal / Hard - bisa diganti kapan saja di HUD
+- **Mercy Mechanic**: Kalah 3x di stage yang sama = auto-heal 30% HP
+
 ## 📚 Konten Materi
 
 ### Bab 1: Hajimari Village (Dasar - Hiragana) 🍃
