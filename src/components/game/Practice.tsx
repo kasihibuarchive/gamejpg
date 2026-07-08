@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useGame } from "@/lib/game/store";
 import { getAllStages } from "@/lib/game/stages";
 import { getWorld } from "@/lib/game/worlds";
+import { checkTypingAnswer, getPrimaryAnswer } from "@/lib/game/answer-check";
 import { PixelButton, PixelPanel } from "./PixelUI";
 import { audio } from "@/lib/game/audio";
 import type { Question, Stage } from "@/lib/game/types";
@@ -341,17 +342,7 @@ export function Practice() {
     if (lastAnswer !== null) return;
     if (!typedAnswer.trim()) return;
     if (currentQuestion.type === "typing") {
-      const normalized = typedAnswer
-        .trim()
-        .toLowerCase()
-        .replace(/ā/g, "a")
-        .replace(/ī/g, "i")
-        .replace(/ū/g, "u")
-        .replace(/ē/g, "e")
-        .replace(/ō/g, "o");
-      const isCorrect = currentQuestion.answer.some(
-        (a) => a.toLowerCase() === normalized,
-      );
+      const isCorrect = checkTypingAnswer(typedAnswer, currentQuestion.answer);
       handleAnswer(isCorrect);
     }
   };
@@ -514,7 +505,7 @@ export function Practice() {
                     <span style={{ color: "var(--kq-correct)" }}>✓ Benar!</span>
                   ) : (
                     <span style={{ color: "var(--kq-attack)" }}>
-                      ✗ Jawaban: {currentQuestion.answer[0]}
+                      ✗ Jawaban: {getPrimaryAnswer(currentQuestion.answer)}
                     </span>
                   )}
                 </div>

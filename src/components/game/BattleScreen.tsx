@@ -8,6 +8,7 @@ import { ITEMS, getItem } from "@/lib/game/items";
 import { getEnemySprite, getHeroSprite } from "@/lib/game/sprites";
 import { scaleEnemy, processEnemyTurn, computePlayerDamage, computePlayerStatsEffect, processAbilitiesOnCorrect, hasPerk, ABILITY_INFO } from "@/lib/game/enemy-ai";
 import { getBattleQuestions } from "@/lib/game/question-randomizer";
+import { checkTypingAnswer, getPrimaryAnswer } from "@/lib/game/answer-check";
 import { SCALING } from "@/lib/game/types";
 import { PixelButton, PixelPanel, PixelSprite, StatBar } from "./PixelUI";
 import { audio } from "@/lib/game/audio";
@@ -634,17 +635,7 @@ export function BattleScreen() {
     if (state.lastAnswerCorrect !== null) return;
     if (!typedAnswer.trim()) return;
     if (currentQuestion?.type === "typing") {
-      const normalized = typedAnswer
-        .trim()
-        .toLowerCase()
-        .replace(/ā/g, "a")
-        .replace(/ī/g, "i")
-        .replace(/ū/g, "u")
-        .replace(/ē/g, "e")
-        .replace(/ō/g, "o");
-      const correct = currentQuestion.answer.some(
-        (a) => a.toLowerCase() === normalized,
-      );
+      const correct = checkTypingAnswer(typedAnswer, currentQuestion.answer);
       handleAnswer(correct);
     }
   };
@@ -1578,7 +1569,7 @@ export function BattleScreen() {
                       </span>
                     ) : (
                       <span style={{ color: "var(--kq-attack)" }}>
-                        ✗ Jawaban: {currentQuestion.answer[0]}
+                        ✗ Jawaban: {getPrimaryAnswer(currentQuestion.answer)}
                       </span>
                     )}
                   </div>

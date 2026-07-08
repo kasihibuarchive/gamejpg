@@ -117,11 +117,17 @@ export function expandQuestionPool(stage: Stage): Question[] {
 
     // Always add: "find the romaji for this kana" (reverse typing)
     if (row.romaji) {
+      // Split romaji on "/" to support multiple acceptable answers
+      // e.g. "kyuu/ku" → ["kyuu", "ku"]
+      const acceptableAnswers = row.romaji
+        .split("/")
+        .map((s) => s.trim())
+        .filter(Boolean);
       extra.push({
         type: "typing",
         prompt: `Ketik romaji untuk huruf ini:`,
         kana: row.kana,
-        answer: [row.romaji],
+        answer: acceptableAnswers,
         hint: row.meaning,
       });
     }
