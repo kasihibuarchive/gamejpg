@@ -4,6 +4,9 @@ import { useEffect } from "react";
 import { useGame } from "@/lib/game/store";
 import { WORLDS } from "@/lib/game/worlds";
 import { HAJIMARI_STAGES } from "@/lib/game/stages";
+import { KATAKANA_STAGES } from "@/lib/game/katakana-stages";
+import { N5_STAGES } from "@/lib/game/n5-stages";
+import { ITEMS } from "@/lib/game/items";
 import { PixelButton, PixelPanel, PixelDivider } from "./PixelUI";
 import { audio } from "@/lib/game/audio";
 
@@ -16,7 +19,8 @@ export function Codex() {
 
   // Collect all unique kana learned from completed stages
   const learnedKana: { kana: string; romaji: string; meaning?: string }[] = [];
-  for (const stage of HAJIMARI_STAGES) {
+  const allStages = [...HAJIMARI_STAGES, ...KATAKANA_STAGES, ...N5_STAGES];
+  for (const stage of allStages) {
     if (player.completedStages.includes(stage.id) && stage.lesson) {
       for (const row of stage.lesson.rows) {
         if (!learnedKana.find((k) => k.kana === row.kana)) {
@@ -137,27 +141,63 @@ export function Codex() {
             className="font-pixel text-sm mb-3 flex items-center gap-2"
             style={{ color: "var(--kq-panel-border)" }}
           >
-            🎒 ITEM
+            🎒 ITEM ({player.items.length})
           </h3>
           {player.items.length === 0 ? (
             <p className="font-vt text-base text-black/60">
-              Tas kosong. Kumpulkan item dari stage-stage yang kau selesaikan!
+              Tas kosong. Kumpulkan item dari stage-stage yang kau selesaikan,
+              atau beli dari 🏪 Toko Ramuan!
             </p>
           ) : (
             <div className="space-y-2">
-              {player.items.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="p-2 flex items-center gap-3"
-                  style={{
-                    background: "var(--kq-panel-2)",
-                    border: "2px solid var(--kq-panel-border)",
-                  }}
-                >
-                  <span className="text-2xl">📦</span>
-                  <span className="font-vt text-base text-black">{item}</span>
-                </div>
-              ))}
+              {player.items.map((itemId, idx) => {
+                const def = ITEMS[itemId];
+                const count = player.itemCounts[itemId] || 0;
+                return (
+                  <div
+                    key={idx}
+                    className="p-2 flex items-center gap-3"
+                    style={{
+                      background: def?.consumable
+                        ? "var(--kq-panel-2)"
+                        : "var(--kq-accent)",
+                      border: "2px solid var(--kq-panel-border)",
+                    }}
+                  >
+                    <span className="text-2xl shrink-0">{def?.icon ?? "📦"}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-pixel text-[0.55rem] text-black truncate">
+                        {def?.name ?? itemId}
+                      </div>
+                      <div className="font-vt text-sm text-black/70 truncate">
+                        {def?.description ?? "Item misterius"}
+                      </div>
+                    </div>
+                    {def?.consumable && (
+                      <span
+                        className="font-pixel text-[0.5rem] text-black px-2 py-1 shrink-0"
+                        style={{
+                          background: "var(--kq-panel)",
+                          border: "2px solid var(--kq-panel-border)",
+                        }}
+                      >
+                        x{count}
+                      </span>
+                    )}
+                    {!def?.consumable && (
+                      <span
+                        className="font-pixel text-[0.4rem] text-black px-2 py-1 shrink-0"
+                        style={{
+                          background: "var(--kq-panel-border)",
+                          color: "var(--kq-accent)",
+                        }}
+                      >
+                        LANGKA
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </PixelPanel>

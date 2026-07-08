@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Fragment } from "react";
 import { useGame } from "@/lib/game/store";
 import { getStagesByWorld } from "@/lib/game/stages";
 import { getWorld } from "@/lib/game/worlds";
@@ -125,124 +125,156 @@ export function StageSelect() {
             {stages.map((stage, idx) => {
               const isUnlocked = isStageUnlocked(stage.id, idx);
               const isCompleted = player.completedStages.includes(stage.id);
-              const isCurrent =
-                isUnlocked && !isCompleted;
+              const isCurrent = isUnlocked && !isCompleted;
               const meta = STAGE_TYPE_META[stage.type];
-              const isLeft = idx % 2 === 0; // zigzag on desktop
+              const isLeft = idx % 2 === 0;
+              const showChapterDivider =
+                stage.chapter &&
+                (idx === 0 ||
+                  (stages[idx - 1] && stages[idx - 1].chapter !== stage.chapter));
 
               return (
-                <div
-                  key={stage.id}
-                  className={`flex ${isLeft ? "md:justify-start" : "md:justify-end"}`}
-                >
-                  <button
-                    onClick={() => handleStageClick(stage.id, isUnlocked)}
-                    onMouseEnter={() => isUnlocked && audio.hover()}
-                    disabled={!isUnlocked}
-                    className={`block w-full md:w-[60%] text-left transition-transform ${isUnlocked ? "hover:-translate-y-1" : "cursor-not-allowed"} ${isCurrent ? "kq-pulse-glow" : ""}`}
-                    aria-label={`Stage ${stage.index}: ${stage.title}`}
-                    aria-disabled={!isUnlocked}
-                  >
-                    <PixelPanel
-                      variant="light"
-                      className={`p-0 overflow-hidden ${!isUnlocked ? "opacity-60 grayscale" : ""}`}
-                    >
-                      {/* Stage number badge + type */}
-                      <div
-                        className="px-3 py-2 flex items-center justify-between gap-2"
+                <Fragment key={stage.id}>
+                  {showChapterDivider && (
+                    <div className="flex items-center gap-3 my-2">
+                      <span
                         style={{
-                          background: isCompleted
-                            ? "var(--kq-correct)"
-                            : meta.color,
-                          borderBottom: "3px solid var(--kq-panel-border)",
+                          flex: 1,
+                          height: 3,
+                          background: world.color,
+                        }}
+                      />
+                      <span
+                        className="font-pixel text-[0.55rem] px-3 py-1 whitespace-nowrap"
+                        style={{
+                          background: world.color,
+                          color: "var(--kq-panel-border)",
+                          border: "3px solid var(--kq-panel-border)",
                         }}
                       >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className="font-pixel text-[0.55rem] px-2 py-1 shrink-0"
-                            style={{
-                              background: "var(--kq-panel-border)",
-                              color: isCompleted
-                                ? "var(--kq-correct)"
-                                : meta.color,
-                            }}
-                          >
-                            STAGE {String(stage.index).padStart(2, "0")}
-                          </span>
-                          <span className="font-pixel text-[0.5rem] text-black truncate">
-                            {meta.icon} {meta.label}
-                          </span>
-                        </div>
-                        {isCompleted && (
-                          <span className="font-pixel text-[0.6rem] text-black shrink-0">
-                            ✓
-                          </span>
-                        )}
-                        {!isUnlocked && (
-                          <span className="font-pixel text-[0.6rem] text-black/70 shrink-0">
-                            🔒
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Stage content */}
-                      <div className="p-4 flex items-center gap-4">
+                        BAB {stage.chapter}
+                      </span>
+                      <span
+                        style={{
+                          flex: 1,
+                          height: 3,
+                          background: world.color,
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div
+                    className={`flex ${isLeft ? "md:justify-start" : "md:justify-end"}`}
+                  >
+                    <button
+                      onClick={() => handleStageClick(stage.id, isUnlocked)}
+                      onMouseEnter={() => isUnlocked && audio.hover()}
+                      disabled={!isUnlocked}
+                      className={`block w-full md:w-[60%] text-left transition-transform ${isUnlocked ? "hover:-translate-y-1" : "cursor-not-allowed"} ${isCurrent ? "kq-pulse-glow" : ""}`}
+                      aria-label={`Stage ${stage.index}: ${stage.title}`}
+                      aria-disabled={!isUnlocked}
+                    >
+                      <PixelPanel
+                        variant="light"
+                        className={`p-0 overflow-hidden ${!isUnlocked ? "opacity-60 grayscale" : ""}`}
+                      >
+                        {/* Stage number badge + type */}
                         <div
-                          className="shrink-0 w-14 h-14 md:w-16 md:h-16 flex items-center justify-center font-pixel text-2xl"
+                          className="px-3 py-2 flex items-center justify-between gap-2"
                           style={{
                             background: isCompleted
                               ? "var(--kq-correct)"
-                              : "var(--kq-panel-2)",
-                            border: "3px solid var(--kq-panel-border)",
-                            color: "var(--kq-panel-border)",
+                              : meta.color,
+                            borderBottom: "3px solid var(--kq-panel-border)",
                           }}
                         >
-                          {isCompleted ? "★" : isUnlocked ? stage.index : "🔒"}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div
-                            className="font-pixel text-[0.75rem] mb-1"
-                            style={{ color: "var(--kq-panel-border)" }}
-                          >
-                            {stage.title}
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span
+                              className="font-pixel text-[0.55rem] px-2 py-1 shrink-0"
+                              style={{
+                                background: "var(--kq-panel-border)",
+                                color: isCompleted
+                                  ? "var(--kq-correct)"
+                                  : meta.color,
+                              }}
+                            >
+                              STAGE {String(stage.index).padStart(2, "0")}
+                            </span>
+                            <span className="font-pixel text-[0.5rem] text-black truncate">
+                              {meta.icon} {meta.label}
+                            </span>
                           </div>
-                          <div className="font-vt text-base text-black/80">
-                            {stage.subtitle}
-                          </div>
-                          {isUnlocked && stage.enemies.length > 0 && (
-                            <div className="mt-2 flex items-center gap-1 flex-wrap">
-                              <span className="font-pixel text-[0.4rem] text-black/60">
-                                MUSUH:
-                              </span>
-                              {stage.enemies.map((e) => (
-                                <span
-                                  key={e.id}
-                                  className="text-lg"
-                                  style={{
-                                    filter: "drop-shadow(1px 1px 0 rgba(0,0,0,0.3))",
-                                  }}
-                                  title={e.name}
-                                >
-                                  {e.sprite}
-                                </span>
-                              ))}
-                            </div>
+                          {isCompleted && (
+                            <span className="font-pixel text-[0.6rem] text-black shrink-0">
+                              ✓
+                            </span>
+                          )}
+                          {!isUnlocked && (
+                            <span className="font-pixel text-[0.6rem] text-black/70 shrink-0">
+                              🔒
+                            </span>
                           )}
                         </div>
-                        <div className="shrink-0">
-                          {isUnlocked ? (
-                            <span
-                              className="font-pixel text-[0.55rem] hidden sm:inline"
-                              style={{ color: meta.color }}
+
+                        {/* Stage content */}
+                        <div className="p-4 flex items-center gap-4">
+                          <div
+                            className="shrink-0 w-14 h-14 md:w-16 md:h-16 flex items-center justify-center font-pixel text-2xl"
+                            style={{
+                              background: isCompleted
+                                ? "var(--kq-correct)"
+                                : "var(--kq-panel-2)",
+                              border: "3px solid var(--kq-panel-border)",
+                              color: "var(--kq-panel-border)",
+                            }}
+                          >
+                            {isCompleted ? "★" : isUnlocked ? stage.index : "🔒"}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div
+                              className="font-pixel text-[0.75rem] mb-1"
+                              style={{ color: "var(--kq-panel-border)" }}
                             >
-                              ▶
-                            </span>
-                          ) : null}
+                              {stage.title}
+                            </div>
+                            <div className="font-vt text-base text-black/80">
+                              {stage.subtitle}
+                            </div>
+                            {isUnlocked && stage.enemies.length > 0 && (
+                              <div className="mt-2 flex items-center gap-1 flex-wrap">
+                                <span className="font-pixel text-[0.4rem] text-black/60">
+                                  MUSUH:
+                                </span>
+                                {stage.enemies.map((e) => (
+                                  <span
+                                    key={e.id}
+                                    className="text-lg"
+                                    style={{
+                                      filter: "drop-shadow(1px 1px 0 rgba(0,0,0,0.3))",
+                                    }}
+                                    title={e.name}
+                                  >
+                                    {e.sprite}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div className="shrink-0">
+                            {isUnlocked ? (
+                              <span
+                                className="font-pixel text-[0.55rem] hidden sm:inline"
+                                style={{ color: meta.color }}
+                              >
+                                ▶
+                              </span>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
-                    </PixelPanel>
-                  </button>
-                </div>
+                      </PixelPanel>
+                    </button>
+                  </div>
+                </Fragment>
               );
             })}
 

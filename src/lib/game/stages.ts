@@ -1,4 +1,4 @@
-import type { Stage } from "./types";
+import type { Stage, WorldId } from "./types";
 
 // ===== HAJIMARI VILLAGE - CHAPTER 1: HIRAGANA =====
 // 10 stages forming one story arc following PDF spec:
@@ -930,68 +930,34 @@ export const HAJIMARI_STAGES: Stage[] = [
   },
 ];
 
-// ===== N5+ PREVIEW STAGES (placeholder to make game complete) =====
-// These give a sense of progression without being empty.
+// ===== STAGE AGGREGATION =====
+// All stages are combined from multiple files for maintainability.
 
-export const N5_PREVIEW_STAGES: Stage[] = [
-  {
-    id: "n5-1",
-    worldId: "n5",
-    index: 1,
-    title: "Tiba di Vassal Kingdom",
-    subtitle: "Preview - Coming Soon",
-    type: "lesson",
-    intro: [
-      "**Gerbang Vassal Kingdom**",
-      "Setelah memperoleh Paspor Petualang, kau tiba di kerajaan yang ramai di lembah.",
-      "Penjaga gerbang memeriksa paspormu dan tersenyum. 「Selamat datang di Vassal Kingdom.」",
-      "「Di sini, kau akan belajar kosakata dasar, tata bahasa esensial, dan Kanji pertamamu.」",
-      "**[Preview Mode]** Bab N5 sedang dalam pengembangan. Coba mainkan dulu 10 stage Hajimari Village untuk menguasai hiragana dengan sempurna!",
-    ],
-    outro: [],
-    lesson: {
-      title: "Pengantar Kosakata Dasar",
-      rows: [
-        { kana: "私", romaji: "watashi", meaning: "saya" },
-        { kana: "あなた", romaji: "anata", meaning: "kamu" },
-        { kana: "こんにちは", romaji: "konnichiwa", meaning: "halo" },
-        { kana: "ありがとう", romaji: "arigatou", meaning: "terima kasih" },
-      ],
-      note: "Ini contoh materi N5. Full modul akan datang di update berikutnya.",
-    },
-    enemies: [],
-    questions: [
-      {
-        type: "choice",
-        prompt: "Apa arti 'arigatou'?",
-        options: ["Terima kasih", "Halo", "Selamat tinggal", "Maaf"],
-        answer: 0,
-      },
-      {
-        type: "choice",
-        prompt: "Apa arti 'konnichiwa'?",
-        options: ["Halo", "Selamat pagi", "Selamat malam", "Sampai jumpa"],
-        answer: 0,
-      },
-      {
-        type: "typing",
-        prompt: "Ketik romaji untuk 'terima kasih':",
-        kana: "ありがとう",
-        answer: ["arigatou", "arigato"],
-      },
-    ],
-    reward: { xp: 30 },
-  },
-];
+import { KATAKANA_STAGES } from "./katakana-stages";
+import { N5_STAGES } from "./n5-stages";
 
 export function getAllStages(): Stage[] {
-  return [...HAJIMARI_STAGES, ...N5_PREVIEW_STAGES];
+  return [...HAJIMARI_STAGES, ...KATAKANA_STAGES, ...N5_STAGES];
 }
 
 export function getStagesByWorld(worldId: string): Stage[] {
-  return getAllStages().filter((s) => s.worldId === worldId);
+  return getAllStages()
+    .filter((s) => s.worldId === worldId)
+    .sort((a, b) => a.index - b.index);
 }
 
 export function getStage(id: string): Stage | undefined {
   return getAllStages().find((s) => s.id === id);
+}
+
+// World unlock logic: which world does completing a boss stage unlock?
+export function getWorldUnlockForStage(stageId: string): WorldId | undefined {
+  if (stageId === "hajimari-10") return "n5"; // After Bab 1 (Hiragana)
+  // hajimari-20 (Katakana) also unlocks N5
+  if (stageId === "hajimari-20") return "n5";
+  if (stageId === "n5-10") return "n4"; // Future
+  if (stageId === "n4-10") return "n3";
+  if (stageId === "n3-10") return "n2";
+  if (stageId === "n2-10") return "n1";
+  return undefined;
 }

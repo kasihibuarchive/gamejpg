@@ -10,6 +10,9 @@ import { StageSelect } from "@/components/game/StageSelect";
 import { StoryCutscene } from "@/components/game/StoryCutscene";
 import { BattleScreen } from "@/components/game/BattleScreen";
 import { Codex } from "@/components/game/Codex";
+import { Shop } from "@/components/game/Shop";
+import { Practice } from "@/components/game/Practice";
+import { Achievements } from "@/components/game/Achievements";
 
 export default function Page() {
   const { view, soundEnabled, crtEnabled } = useGame();
@@ -23,9 +26,6 @@ export default function Page() {
   useEffect(() => {
     const onFirstClick = () => {
       audio.resume();
-      if (soundEnabled) {
-        // music will start when entering a view
-      }
     };
     window.addEventListener("click", onFirstClick, { once: true });
     window.addEventListener("keydown", onFirstClick, { once: true });
@@ -33,7 +33,7 @@ export default function Page() {
       window.removeEventListener("click", onFirstClick);
       window.removeEventListener("keydown", onFirstClick);
     };
-  }, [soundEnabled]);
+  }, []);
 
   // Title screen has its own full layout
   if (view === "title") {
@@ -54,6 +54,9 @@ export default function Page() {
         {view === "story" && <StoryCutscene />}
         {view === "battle" && <BattleScreen />}
         {view === "codex" && <Codex />}
+        {view === "shop" && <Shop />}
+        {view === "practice" && <Practice />}
+        {view === "achievements" && <Achievements />}
       </main>
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useGame } from "@/lib/game/store";
 import { getStage } from "@/lib/game/stages";
 import { getWorld } from "@/lib/game/worlds";
+import { ITEMS, getItem } from "@/lib/game/items";
 import { PixelButton, PixelPanel, PixelSprite, StatBar } from "./PixelUI";
 import { audio } from "@/lib/game/audio";
 import type { Question } from "@/lib/game/types";
@@ -14,6 +15,12 @@ interface BattleState {
   playerHp: number;
   questionIdx: number;
   totalCorrect: number;
+  // Combo & crit
+  combo: number;
+  bestCombo: number;
+  isCritical: boolean;
+  // Shield (blocks next enemy hit)
+  shieldActive: boolean;
   // animation flags
   enemyShake: boolean;
   enemyFlashRed: boolean;
@@ -21,6 +28,7 @@ interface BattleState {
   // damage floaters
   enemyDamageText: string | null;
   playerDamageText: string | null;
+  comboText: string | null;
   // status message (above question)
   statusMessage: string;
   // answer feedback
@@ -28,6 +36,10 @@ interface BattleState {
   // game over states
   battleEnded: boolean;
   victory: boolean;
+  // achievements gained during battle
+  newAchievements: string[];
+  // coins gained
+  coinsGained: number;
 }
 
 const INITIAL_PLAYER_HP_KEY = "kq-temp-player-hp";
@@ -39,7 +51,11 @@ export function BattleScreen() {
     setLastResult,
     completeStage,
     damagePlayer,
+    consumeItem,
+    hasItem,
+    recordAnswer,
     player,
+    stats,
   } = useGame();
 
   const stage = selectedStageId ? getStage(selectedStageId) : null;
@@ -51,15 +67,22 @@ export function BattleScreen() {
     playerHp: player.hp,
     questionIdx: 0,
     totalCorrect: 0,
+    combo: 0,
+    bestCombo: 0,
+    isCritical: false,
+    shieldActive: false,
     enemyShake: false,
     enemyFlashRed: false,
     playerShake: false,
     enemyDamageText: null,
     playerDamageText: null,
+    comboText: null,
     statusMessage: "Pertarungan dimulai! Jawab dengan benar untuk menyerang!",
     lastAnswerCorrect: null,
     battleEnded: false,
     victory: false,
+    newAchievements: [],
+    coinsGained: 0,
   });
 
   const [typedAnswer, setTypedAnswer] = useState("");
@@ -70,6 +93,7 @@ export function BattleScreen() {
     { side: "left" | "right"; idx: number } | null
   >(null);
   const [matchError, setMatchError] = useState<number | null>(null);
+  const [showItemMenu, setShowItemMenu] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const questionAreaRef = useRef<HTMLDivElement>(null);
@@ -77,20 +101,15 @@ export function BattleScreen() {
   // Start music
   useEffect(() => {
     audio.resume();
-    if (stage?.type === "boss" || stage?.type === "mini-boss") {
-      audio.playMusic("battle");
-    } else {
-      audio.playMusic("battle");
-    }
+    audio.playMusic("battle");
     return () => {
       audio.stopMusic();
     };
   }, [stage?.type]);
 
-  // Save player HP at battle start so we can restore if needed
+  // Save player HP at battle start
   useEffect(() => {
     if (stage) {
-      // Take a snapshot of player HP entering battle
       sessionStorage.setItem(INITIAL_PLAYER_HP_KEY, String(player.hp));
     }
   }, [stage?.id, player.hp]);
@@ -106,12 +125,15 @@ export function BattleScreen() {
   }, [currentQuestion, state.questionIdx, state.battleEnded]);
 
   const showFloatingDamage = useCallback(
-    (target: "enemy" | "player", amount: number) => {
+    (target: "enemy" | "player", amount: number, isCrit = false) => {
       if (target === "enemy") {
-        setState((s) => ({ ...s, enemyDamageText: `-${amount}` }));
+        setState((s) => ({
+          ...s,
+          enemyDamageText: isCrit ? `CRIT! -${amount}` : `-${amount}`,
+        }));
         setTimeout(() => {
           setState((s) => ({ ...s, enemyDamageText: null }));
-        }, 800);
+        }, 1000);
       } else {
         setState((s) => ({ ...s, playerDamageText: `-${amount}` }));
         setTimeout(() => {
@@ -122,7 +144,7 @@ export function BattleScreen() {
     [],
   );
 
-  const endBattle = (victory: boolean, totalCorrect: number) => {
+  const endBattle = (victory: boolean, totalCorrect: number, bestCombo: number) => {
     audio.stopMusic();
     if (victory) {
       audio.victory();
@@ -131,9 +153,13 @@ export function BattleScreen() {
     }
 
     // Compute rewards
-    const xpGained = victory
-      ? stage?.reward.xp ?? 0
-      : Math.floor((stage?.reward.xp ?? 0) * 0.1);
+    const baseXp = stage?.reward.xp ?? 0;
+    const xpGained = victory ? baseXp : Math.floor(baseXp * 0.1);
+    // Coins: stage rewards give coins = xp/2 + bonus for perfect
+    const perfect = victory && totalCorrect === stage?.questions.length;
+    const baseCoins = victory
+      ? Math.floor(baseXp / 3) + (perfect ? 30 : 0) + bestCombo * 5
+      : 5;
     const itemsGained = victory
       ? stage?.reward.item
         ? [stage.reward.item]
@@ -145,58 +171,80 @@ export function BattleScreen() {
         : []
       : [];
 
-    // Determine world unlock from boss completion
+    // Determine world unlock
     let unlockWorld: any = undefined;
-    if (victory && stage?.id === "hajimari-10") {
-      unlockWorld = "n5";
+    if (victory && stage) {
+      if (stage.id === "hajimari-10" || stage.id === "hajimari-20") unlockWorld = "n5";
+      else if (stage.id === "n5-10") unlockWorld = "n4";
     }
 
-    // Apply completion rewards (only if victory)
+    // Apply completion rewards
+    let newAchievements: string[] = [];
     if (victory && stage) {
-      completeStage({
+      newAchievements = completeStage({
         stageId: stage.id,
         xp: xpGained,
+        coins: baseCoins,
         items: itemsGained,
         badges: badgesGained,
         unlockWorld,
         restoreHp: true,
+        bestCombo,
+        correctCount: totalCorrect,
       });
+      if (newAchievements.length > 0) {
+        audio.levelUp();
+      }
     }
 
     setLastResult({
       stageId: stage?.id ?? "",
       victory,
       xpGained,
+      coinsGained: baseCoins,
       correctCount: totalCorrect,
       totalCount: stage?.questions.length ?? 0,
+      bestCombo,
       itemsGained,
       badgesGained,
+      achievementsGained: newAchievements,
     });
 
     setState((s) => ({
       ...s,
       battleEnded: true,
       victory,
+      newAchievements,
+      coinsGained: baseCoins,
     }));
   };
 
-  // Use a ref to track if endBattle has been triggered, to avoid double-calling
+  // Use a ref to track if endBattle has been triggered
   const endedRef = useRef(false);
-  // Check win/lose after state changes - use microtask to defer setState
+  // Check win/lose after state changes
   useEffect(() => {
     if (state.battleEnded || endedRef.current) return;
     if (state.enemyHp <= 0) {
       endedRef.current = true;
-      // Defer to avoid setState-in-effect lint issue
-      queueMicrotask(() => endBattle(true, state.totalCorrect));
+      queueMicrotask(() =>
+        endBattle(true, state.totalCorrect, state.bestCombo),
+      );
       return;
     }
     if (state.playerHp <= 0) {
       endedRef.current = true;
-      queueMicrotask(() => endBattle(false, state.totalCorrect));
+      queueMicrotask(() =>
+        endBattle(false, state.totalCorrect, state.bestCombo),
+      );
       return;
     }
-  }, [state.enemyHp, state.playerHp, state.battleEnded, state.totalCorrect]);
+  }, [
+    state.enemyHp,
+    state.playerHp,
+    state.battleEnded,
+    state.totalCorrect,
+    state.bestCombo,
+  ]);
 
   const handleAnswer = useCallback(
     (isCorrect: boolean) => {
@@ -206,41 +254,88 @@ export function BattleScreen() {
       setSelectedMatch(null);
 
       const enemy = currentEnemy!;
-      const playerDmg = isCorrect ? Math.max(1, Math.ceil(enemy.hp / stage!.questions.length)) + (Math.random() < 0.3 ? 1 : 0) : 0;
-      // Damage to enemy: distribute HP across questions so all-correct = death
-      // Actually simpler: each correct answer deals enemy.hp / totalQuestions damage
+      // Base damage = enemy.hp / totalQuestions so all-correct = death
+      const baseDmg = Math.ceil(enemy.hp / stage!.questions.length);
+      // Combo system: every consecutive correct adds +1 damage
+      const newCombo = isCorrect ? state.combo + 1 : 0;
+      const comboBonus = isCorrect ? Math.min(newCombo - 1, 5) : 0; // up to +5 bonus
+      // Critical hit: 15% chance, doubles damage
+      const isCrit = isCorrect && Math.random() < 0.15;
+      const critMult = isCrit ? 2 : 1;
       const dmgToEnemy = isCorrect
-        ? Math.ceil(enemy.hp / stage!.questions.length)
+        ? (baseDmg + comboBonus) * critMult
         : 0;
-      const dmgToPlayer = !isCorrect ? enemy.attack : 0;
+
+      // Shield blocks enemy damage
+      const shieldBlocked = state.shieldActive && !isCorrect;
+      const dmgToPlayer =
+        !isCorrect && !shieldBlocked ? enemy.attack : 0;
+
+      // Update stats tracking
+      recordAnswer(isCorrect);
+      if (isCorrect && newCombo > state.bestCombo) {
+        // best combo tracked in state
+      }
 
       setState((s) => ({
         ...s,
         lastAnswerCorrect: isCorrect,
         totalCorrect: isCorrect ? s.totalCorrect + 1 : s.totalCorrect,
+        combo: newCombo,
+        bestCombo: Math.max(s.bestCombo, newCombo),
+        isCritical: isCrit,
         enemyHp: Math.max(0, s.enemyHp - dmgToEnemy),
         playerHp: Math.max(0, s.playerHp - dmgToPlayer),
+        shieldActive: shieldBlocked ? false : s.shieldActive,
         enemyShake: isCorrect,
         enemyFlashRed: isCorrect,
-        playerShake: !isCorrect,
+        playerShake: !isCorrect && !shieldBlocked,
+        enemyDamageText: null, // will be set by showFloatingDamage
+        playerDamageText: null,
+        comboText: isCorrect && newCombo >= 2 ? `${newCombo}x COMBO!` : null,
         statusMessage: isCorrect
-          ? "✓ Benar! Serangan mengenai musuh!"
-          : "✗ Salah! Musuh membalas!",
+          ? isCrit
+            ? `💥 CRITICAL HIT! Combo ${newCombo}x!`
+            : newCombo >= 2
+              ? `✓ Benar! Combo ${newCombo}x!`
+              : "✓ Benar! Serangan mengenai musuh!"
+          : shieldBlocked
+            ? "🛡 Perisai memblokir serangan!"
+            : "✗ Salah! Musuh membalas!",
       }));
 
+      // Sounds & effects
       if (isCorrect) {
-        audio.correct();
-        setTimeout(() => audio.attack(), 200);
-        setTimeout(() => audio.enemyHit(), 400);
-        showFloatingDamage("enemy", dmgToEnemy);
+        if (isCrit) {
+          audio.correct();
+          setTimeout(() => audio.attack(), 100);
+          setTimeout(() => audio.enemyHit(), 250);
+          setTimeout(() => audio.enemyHit(), 400);
+        } else {
+          audio.correct();
+          setTimeout(() => audio.attack(), 200);
+          setTimeout(() => audio.enemyHit(), 400);
+        }
+        showFloatingDamage("enemy", dmgToEnemy, isCrit);
       } else {
-        audio.wrong();
-        setTimeout(() => audio.playerHit(), 300);
-        showFloatingDamage("player", dmgToPlayer);
+        if (shieldBlocked) {
+          audio.click();
+        } else {
+          audio.wrong();
+          setTimeout(() => audio.playerHit(), 300);
+          showFloatingDamage("player", dmgToPlayer);
+        }
+      }
+
+      // Clear combo text after a moment
+      if (isCorrect && newCombo >= 2) {
+        setTimeout(() => {
+          setState((s) => ({ ...s, comboText: null }));
+        }, 1200);
       }
 
       // Sync store player HP
-      if (!isCorrect) {
+      if (!isCorrect && !shieldBlocked) {
         damagePlayer(dmgToPlayer);
       }
 
@@ -251,28 +346,19 @@ export function BattleScreen() {
           enemyShake: false,
           enemyFlashRed: false,
           playerShake: false,
+          isCritical: false,
         }));
-      }, 500);
+      }, 600);
 
       // Advance question after delay
       setTimeout(() => {
         setState((s) => {
-          // HP was already updated in the first setState above.
-          // Just check current state for end conditions.
-          const isLastQuestion = s.questionIdx >= stage!.questions.length - 1;
+          const isLastQuestion =
+            s.questionIdx >= stage!.questions.length - 1;
 
-          if (s.enemyHp <= 0) {
-            // enemy dead - endBattle effect will handle it
-            return s;
-          }
-          if (s.playerHp <= 0) {
-            return s;
-          }
-          if (isLastQuestion) {
-            // Out of questions but enemy still alive - that's still a win since the player
-            // survived all questions. Trigger victory.
-            return s;
-          }
+          if (s.enemyHp <= 0) return s;
+          if (s.playerHp <= 0) return s;
+          if (isLastQuestion) return s;
 
           return {
             ...s,
@@ -282,18 +368,21 @@ export function BattleScreen() {
           };
         });
 
-        // Reset answer inputs
         setTypedAnswer("");
         setSelectedChoice(null);
         setShowHint(false);
-      }, 1500);
+      }, 1700);
     },
     [
       state.battleEnded,
+      state.combo,
+      state.bestCombo,
+      state.shieldActive,
       currentEnemy,
       stage,
       damagePlayer,
       showFloatingDamage,
+      recordAnswer,
     ],
   );
 
@@ -313,7 +402,14 @@ export function BattleScreen() {
     if (state.lastAnswerCorrect !== null) return;
     if (!typedAnswer.trim()) return;
     if (currentQuestion?.type === "typing") {
-      const normalized = typedAnswer.trim().toLowerCase().replace(/ā/g, "a").replace(/ī/g, "i").replace(/ū/g, "u").replace(/ē/g, "e").replace(/ō/g, "o");
+      const normalized = typedAnswer
+        .trim()
+        .toLowerCase()
+        .replace(/ā/g, "a")
+        .replace(/ī/g, "i")
+        .replace(/ū/g, "u")
+        .replace(/ē/g, "e")
+        .replace(/ō/g, "o");
       const correct = currentQuestion.answer.some(
         (a) => a.toLowerCase() === normalized,
       );
@@ -334,16 +430,15 @@ export function BattleScreen() {
     }
 
     if (selectedMatch.side === side) {
-      // re-select same side
       setSelectedMatch({ side, idx });
       return;
     }
 
-    // Match attempt
     const leftIdx = side === "left" ? idx : selectedMatch.idx;
     const rightIdx = side === "right" ? idx : selectedMatch.idx;
     const correctPair = currentQuestion.pairs[leftIdx];
-    const isCorrect = correctPair.right === currentQuestion.pairs[rightIdx].right;
+    const isCorrect =
+      correctPair.right === currentQuestion.pairs[rightIdx].right;
 
     if (isCorrect) {
       audio.correct();
@@ -351,7 +446,6 @@ export function BattleScreen() {
       setMatchedPairs(newMatched);
       setSelectedMatch(null);
       if (newMatched.length === currentQuestion.pairs.length) {
-        // all matched!
         setTimeout(() => handleAnswer(true), 400);
       }
     } else {
@@ -359,12 +453,78 @@ export function BattleScreen() {
       setMatchError(idx);
       setTimeout(() => setMatchError(null), 400);
       setSelectedMatch(null);
-      // Don't fail the battle, just reset selection
     }
   };
 
+  // ===== ITEM USAGE =====
+  const handleUseItem = (itemId: string) => {
+    if (state.battleEnded) return;
+    if (!hasItem(itemId)) return;
+    const def = getItem(itemId);
+    if (!def || !def.consumable) return;
+
+    audio.click();
+    const effect = consumeItem(itemId);
+
+    if (effect === "heal" || effect === "fullheal") {
+      const healAmount = def.value === 999 ? state.playerHp : def.value;
+      const newHp = Math.min(
+        player.maxHp,
+        state.playerHp + (def.value === 999 ? player.maxHp - state.playerHp : def.value),
+      );
+      setState((s) => ({
+        ...s,
+        playerHp: newHp,
+        statusMessage: `${def.icon} ${def.name}! +${def.value === 999 ? player.maxHp - state.playerHp : def.value} HP!`,
+        enemyDamageText: null,
+        playerDamageText: null,
+      }));
+      // Show heal floater
+      setTimeout(() => {
+        setState((s) => ({ ...s, playerDamageText: `+${healAmount}` }));
+        setTimeout(() => {
+          setState((s) => ({ ...s, playerDamageText: null }));
+        }, 800);
+      }, 50);
+    } else if (effect === "shield") {
+      setState((s) => ({
+        ...s,
+        shieldActive: true,
+        statusMessage: `${def.icon} Perisai aktif! Blokir 1 serangan berikutnya!`,
+      }));
+    } else if (effect === "damage") {
+      // Damage enemy directly
+      const dmg = def.value;
+      setState((s) => ({
+        ...s,
+        enemyHp: Math.max(0, s.enemyHp - dmg),
+        enemyShake: true,
+        statusMessage: `${def.icon} ${def.name}! Musuh -${dmg} HP!`,
+      }));
+      audio.attack();
+      showFloatingDamage("enemy", dmg, false);
+      setTimeout(() => {
+        setState((s) => ({ ...s, enemyShake: false }));
+      }, 500);
+    } else if (effect === "hint") {
+      setShowHint(true);
+      setState((s) => ({
+        ...s,
+        statusMessage: `${def.icon} Petunjuk ditampilkan!`,
+      }));
+    }
+
+    setShowItemMenu(false);
+  };
+
+  // Get usable items player has
+  const usableItems = player.items.filter(
+    (id) => ITEMS[id]?.consumable && (player.itemCounts[id] || 0) > 0,
+  );
+
   // ===== END SCREEN =====
   if (state.battleEnded) {
+    const perfect = state.victory && state.totalCorrect === stage?.questions.length;
     return (
       <div
         className="min-h-screen flex items-center justify-center px-4 py-6"
@@ -374,15 +534,26 @@ export function BattleScreen() {
             : "radial-gradient(ellipse at top, var(--kq-attack) 0%, var(--kq-bg) 70%)",
         }}
       >
-        <PixelPanel variant="light" className="p-6 md:p-8 max-w-md w-full kq-pop text-center">
+        <PixelPanel
+          variant="light"
+          className="p-6 md:p-8 max-w-md w-full kq-pop text-center"
+        >
           <div className="text-6xl mb-3 kq-bob">
-            {state.victory ? "🎉" : "💀"}
+            {state.victory ? (perfect ? "🏆" : "🎉") : "💀"}
           </div>
           <h2
             className="font-pixel text-lg md:text-xl mb-2"
-            style={{ color: state.victory ? "var(--kq-correct)" : "var(--kq-attack)" }}
+            style={{
+              color: state.victory
+                ? "var(--kq-correct)"
+                : "var(--kq-attack)",
+            }}
           >
-            {state.victory ? "VICTORY!" : "KALAH..."}
+            {state.victory
+              ? perfect
+                ? "PERFECT VICTORY!"
+                : "VICTORY!"
+              : "KALAH..."}
           </h2>
           <p className="font-vt text-base text-black mb-4">
             {state.victory
@@ -403,9 +574,17 @@ export function BattleScreen() {
               <div className="font-pixel text-[0.55rem] text-right">
                 {state.totalCorrect}/{stage?.questions.length}
               </div>
+              <div>Best Combo:</div>
+              <div className="font-pixel text-[0.55rem] text-right">
+                {state.bestCombo}x
+              </div>
               <div>XP Didapat:</div>
               <div className="font-pixel text-[0.55rem] text-right">
                 +{state.victory ? stage?.reward.xp : Math.floor((stage?.reward.xp ?? 0) * 0.1)}
+              </div>
+              <div>Koin:</div>
+              <div className="font-pixel text-[0.55rem] text-right">
+                +{state.coinsGained}
               </div>
               {state.victory && stage?.reward.item && (
                 <>
@@ -426,7 +605,33 @@ export function BattleScreen() {
             </div>
           </div>
 
-          {/* Outro story if available */}
+          {/* Achievements */}
+          {state.newAchievements.length > 0 && (
+            <div
+              className="p-3 mb-4"
+              style={{
+                background: "var(--kq-accent)",
+                border: "2px solid var(--kq-panel-border)",
+              }}
+            >
+              <div className="font-pixel text-[0.5rem] mb-2 text-black">
+                🏆 ACHIEVEMENT BARU!
+              </div>
+              {state.newAchievements.map((id) => {
+                const a = ACHIEVEMENTS_MAP[id];
+                return (
+                  <div
+                    key={id}
+                    className="font-vt text-base text-black kq-pop"
+                  >
+                    {a?.icon} {a?.name}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Outro story */}
           {state.victory && stage?.outro && stage.outro.length > 0 && (
             <div
               className="p-3 mb-4 max-h-48 overflow-y-auto text-left"
@@ -474,22 +679,29 @@ export function BattleScreen() {
                   variant="danger"
                   onClick={() => {
                     audio.click();
-                    // Reset battle state
+                    endedRef.current = false;
                     setState({
                       enemyHp: stage?.enemies[0]?.hp ?? 1,
                       enemyMaxHp: stage?.enemies[0]?.hp ?? 1,
-                      playerHp: player.hp, // current HP from store
+                      playerHp: player.hp,
                       questionIdx: 0,
                       totalCorrect: 0,
+                      combo: 0,
+                      bestCombo: 0,
+                      isCritical: false,
+                      shieldActive: false,
                       enemyShake: false,
                       enemyFlashRed: false,
                       playerShake: false,
                       enemyDamageText: null,
                       playerDamageText: null,
-                      statusMessage: "Pertarungan dimulai! Coba lagi!",
+                      comboText: null,
+                      statusMessage: "Coba lagi! Semangat!",
                       lastAnswerCorrect: null,
                       battleEnded: false,
                       victory: false,
+                      newAchievements: [],
+                      coinsGained: 0,
                     });
                   }}
                 >
@@ -568,7 +780,7 @@ export function BattleScreen() {
             background: `linear-gradient(to bottom, ${world.colorDark}33, ${world.colorDark}88)`,
             border: "4px solid var(--kq-panel-border)",
             boxShadow: "0 0 0 4px var(--kq-fg)",
-            minHeight: 180,
+            minHeight: 200,
           }}
         >
           {/* Enemy HP bar at top */}
@@ -598,12 +810,47 @@ export function BattleScreen() {
             </div>
           </div>
 
+          {/* Combo indicator (when active) */}
+          {state.combo >= 2 && (
+            <div className="absolute top-3 right-3 z-20">
+              <div
+                className="px-3 py-1.5 kq-pop"
+                style={{
+                  background: "var(--kq-accent)",
+                  border: "3px solid var(--kq-panel-border)",
+                }}
+              >
+                <div className="font-pixel text-[0.5rem] text-black">
+                  🔥 COMBO
+                </div>
+                <div className="font-pixel text-base text-black text-center">
+                  {state.combo}x
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Combo floating text */}
+          {state.comboText && (
+            <div
+              className="absolute top-1/3 left-1/2 -translate-x-1/2 pointer-events-none z-30"
+              style={{ animation: "kq-pop 0.3s ease-out 1" }}
+            >
+              <div
+                className="font-pixel text-2xl md:text-3xl kq-text-outline"
+                style={{ color: "var(--kq-accent)" }}
+              >
+                {state.comboText}
+              </div>
+            </div>
+          )}
+
           {/* Enemy sprite center-top */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <div className="relative">
               <PixelSprite
                 char={currentEnemy.sprite}
-                size={100}
+                size={110}
                 color={currentEnemy.color}
                 float={!state.enemyShake}
                 shake={state.enemyShake}
@@ -611,8 +858,15 @@ export function BattleScreen() {
               />
               {state.enemyDamageText && (
                 <div
-                  className="absolute top-0 left-1/2 -translate-x-1/2 font-pixel text-base kq-damage-float"
-                  style={{ color: "var(--kq-attack)", textShadow: "2px 2px 0 white" }}
+                  className={`absolute top-0 left-1/2 -translate-x-1/2 font-pixel kq-damage-float whitespace-nowrap ${
+                    state.isCritical ? "text-base" : "text-base"
+                  }`}
+                  style={{
+                    color: state.isCritical
+                      ? "var(--kq-accent)"
+                      : "var(--kq-attack)",
+                    textShadow: "2px 2px 0 white",
+                  }}
                 >
                   {state.enemyDamageText}
                 </div>
@@ -625,10 +879,14 @@ export function BattleScreen() {
             <div
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none kq-slash"
               style={{
-                width: 120,
+                width: 140,
                 height: 8,
-                background: "var(--kq-accent)",
-                boxShadow: "0 0 12px var(--kq-accent)",
+                background: state.isCritical
+                  ? "var(--kq-accent)"
+                  : "white",
+                boxShadow: `0 0 ${state.isCritical ? 20 : 12}px ${
+                  state.isCritical ? "var(--kq-accent)" : "white"
+                }`,
               }}
             />
           )}
@@ -637,15 +895,31 @@ export function BattleScreen() {
           <div className="absolute bottom-3 right-3 md:right-8">
             <div className="relative">
               <PixelSprite
-                char="🧙"
-                size={70}
+                char={state.shieldActive ? "🧙‍♂️" : "🧙"}
+                size={75}
                 float={!state.playerShake}
                 shake={state.playerShake}
               />
+              {/* Shield aura */}
+              {state.shieldActive && (
+                <div
+                  className="absolute -inset-2 pointer-events-none"
+                  style={{
+                    border: "3px dashed var(--kq-n4)",
+                    borderRadius: "50%",
+                    animation: "kq-bob 1s ease-in-out infinite",
+                  }}
+                />
+              )}
               {state.playerDamageText && (
                 <div
-                  className="absolute top-0 left-1/2 -translate-x-1/2 font-pixel text-base kq-damage-float"
-                  style={{ color: "var(--kq-attack)", textShadow: "2px 2px 0 white" }}
+                  className="absolute top-0 left-1/2 -translate-x-1/2 font-pixel text-base kq-damage-float whitespace-nowrap"
+                  style={{
+                    color: state.playerDamageText.startsWith("+")
+                      ? "var(--kq-correct)"
+                      : "var(--kq-attack)",
+                    textShadow: "2px 2px 0 white",
+                  }}
                 >
                   {state.playerDamageText}
                 </div>
@@ -686,11 +960,12 @@ export function BattleScreen() {
           <p
             className="font-pixel text-[0.6rem]"
             style={{
-              color: state.lastAnswerCorrect === true
-                ? "var(--kq-correct)"
-                : state.lastAnswerCorrect === false
-                  ? "var(--kq-attack)"
-                  : "var(--kq-fg)",
+              color:
+                state.lastAnswerCorrect === true
+                  ? "var(--kq-correct)"
+                  : state.lastAnswerCorrect === false
+                    ? "var(--kq-attack)"
+                    : "var(--kq-fg)",
             }}
           >
             {state.statusMessage}
@@ -700,8 +975,77 @@ export function BattleScreen() {
         {/* Question area */}
         <PixelPanel
           variant="light"
-          className="p-4 md:p-5 flex-1 flex flex-col"
+          className="p-4 md:p-5 flex-1 flex flex-col relative"
         >
+          {/* Item menu button - top right of question panel */}
+          {usableItems.length > 0 && (
+            <button
+              onClick={() => {
+                audio.click();
+                setShowItemMenu(!showItemMenu);
+              }}
+              className="absolute top-2 right-2 z-10 px-2 py-1"
+              style={{
+                background: showItemMenu
+                  ? "var(--kq-accent)"
+                  : "var(--kq-panel-2)",
+                border: "2px solid var(--kq-panel-border)",
+              }}
+              aria-label="Item menu"
+            >
+              <span className="font-pixel text-[0.5rem] text-black">
+                🎒 ITEM
+              </span>
+            </button>
+          )}
+
+          {/* Item dropdown */}
+          {showItemMenu && usableItems.length > 0 && (
+            <div
+              className="absolute top-10 right-2 z-20 p-2 max-w-[280px] kq-pop"
+              style={{
+                background: "var(--kq-panel)",
+                border: "3px solid var(--kq-panel-border)",
+                boxShadow: "4px 4px 0 rgba(0,0,0,0.4)",
+              }}
+            >
+              <div className="font-pixel text-[0.5rem] mb-2 text-black">
+                PILIH ITEM:
+              </div>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {usableItems.map((itemId) => {
+                  const def = ITEMS[itemId];
+                  const count = player.itemCounts[itemId] || 0;
+                  return (
+                    <button
+                      key={itemId}
+                      onClick={() => handleUseItem(itemId)}
+                      disabled={state.lastAnswerCorrect !== null}
+                      className="w-full flex items-center gap-2 p-2 text-left disabled:opacity-50"
+                      style={{
+                        background: "var(--kq-panel-2)",
+                        border: "2px solid var(--kq-panel-border)",
+                      }}
+                    >
+                      <span className="text-xl shrink-0">{def.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-pixel text-[0.5rem] text-black truncate">
+                          {def.name}
+                        </div>
+                        <div className="font-vt text-xs text-black/70 truncate">
+                          {def.description}
+                        </div>
+                      </div>
+                      <span className="font-pixel text-[0.5rem] text-black shrink-0">
+                        x{count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Question prompt */}
           <div className="text-center mb-4">
             <div
@@ -736,8 +1080,10 @@ export function BattleScreen() {
                 {currentQuestion.options.map((opt, idx) => {
                   const isSelected = selectedChoice === idx;
                   const isCorrectAns = idx === currentQuestion.answer;
-                  const showResult = state.lastAnswerCorrect !== null && isSelected;
-                  const showAsCorrect = state.lastAnswerCorrect !== null && isCorrectAns;
+                  const showResult =
+                    state.lastAnswerCorrect !== null && isSelected;
+                  const showAsCorrect =
+                    state.lastAnswerCorrect !== null && isCorrectAns;
 
                   return (
                     <button
@@ -753,7 +1099,10 @@ export function BattleScreen() {
                           : showAsCorrect
                             ? "var(--kq-correct)"
                             : "var(--kq-panel)",
-                        color: showResult || showAsCorrect ? "var(--kq-panel)" : "var(--kq-panel-border)",
+                        color:
+                          showResult || showAsCorrect
+                            ? "var(--kq-panel)"
+                            : "var(--kq-panel-border)",
                         textTransform: "none",
                         fontFamily: "var(--font-gothic)",
                         fontSize: "1rem",
@@ -764,7 +1113,9 @@ export function BattleScreen() {
                       </span>
                       {opt}
                       {showAsCorrect && <span className="ml-2">✓</span>}
-                      {showResult && !state.lastAnswerCorrect && <span className="ml-2">✗</span>}
+                      {showResult && !state.lastAnswerCorrect && (
+                        <span className="ml-2">✗</span>
+                      )}
                     </button>
                   );
                 })}
@@ -773,7 +1124,10 @@ export function BattleScreen() {
 
             {/* TYPING */}
             {currentQuestion.type === "typing" && (
-              <form onSubmit={handleTypingSubmit} className="max-w-md mx-auto">
+              <form
+                onSubmit={handleTypingSubmit}
+                className="max-w-md mx-auto"
+              >
                 <input
                   ref={inputRef}
                   type="text"
@@ -788,7 +1142,10 @@ export function BattleScreen() {
                   style={{
                     background: "var(--kq-panel-2)",
                     border: "4px solid var(--kq-panel-border)",
-                    boxShadow: state.lastAnswerCorrect === false ? "0 0 0 3px var(--kq-attack)" : "0 0 0 3px var(--kq-panel)",
+                    boxShadow:
+                      state.lastAnswerCorrect === false
+                        ? "0 0 0 3px var(--kq-attack)"
+                        : "0 0 0 3px var(--kq-panel)",
                     outline: "none",
                   }}
                 />
@@ -797,7 +1154,10 @@ export function BattleScreen() {
                     type="submit"
                     variant="accent"
                     size="sm"
-                    disabled={state.lastAnswerCorrect !== null || !typedAnswer.trim()}
+                    disabled={
+                      state.lastAnswerCorrect !== null ||
+                      !typedAnswer.trim()
+                    }
                   >
                     ⚔ SERANG!
                   </PixelButton>
@@ -822,19 +1182,27 @@ export function BattleScreen() {
             {currentQuestion.type === "matching" && (
               <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
                 <div className="space-y-2">
-                  <div className="font-pixel text-[0.45rem] text-center mb-1" style={{ color: "var(--kq-panel-border)" }}>
+                  <div
+                    className="font-pixel text-[0.45rem] text-center mb-1"
+                    style={{ color: "var(--kq-panel-border)" }}
+                  >
                     HURUF
                   </div>
                   {currentQuestion.pairs.map((pair, idx) => {
                     const isMatched = matchedPairs.includes(idx);
                     const isSelected =
-                      selectedMatch?.side === "left" && selectedMatch.idx === idx;
-                    const isError = matchError === idx && selectedMatch?.side === "right";
+                      selectedMatch?.side === "left" &&
+                      selectedMatch.idx === idx;
+                    const isError =
+                      matchError === idx &&
+                      selectedMatch?.side === "right";
                     return (
                       <button
                         key={`l-${idx}`}
                         onClick={() => handleMatchClick("left", idx)}
-                        disabled={isMatched || state.lastAnswerCorrect !== null}
+                        disabled={
+                          isMatched || state.lastAnswerCorrect !== null
+                        }
                         className="w-full py-3 px-2 font-gothic text-3xl transition-transform"
                         style={{
                           background: isMatched
@@ -844,7 +1212,11 @@ export function BattleScreen() {
                               : isError
                                 ? "var(--kq-attack)"
                                 : "var(--kq-panel-2)",
-                          border: `4px solid ${isMatched ? "var(--kq-correct)" : "var(--kq-panel-border)"}`,
+                          border: `4px solid ${
+                            isMatched
+                              ? "var(--kq-correct)"
+                              : "var(--kq-panel-border)"
+                          }`,
                           color: "var(--kq-panel-border)",
                           opacity: isMatched ? 0.5 : 1,
                         }}
@@ -855,20 +1227,27 @@ export function BattleScreen() {
                   })}
                 </div>
                 <div className="space-y-2">
-                  <div className="font-pixel text-[0.45rem] text-center mb-1" style={{ color: "var(--kq-panel-border)" }}>
+                  <div
+                    className="font-pixel text-[0.45rem] text-center mb-1"
+                    style={{ color: "var(--kq-panel-border)" }}
+                  >
                     ROMAJI
                   </div>
-                  {/* Shuffled right side - we'll use original order for simplicity */}
                   {currentQuestion.pairs.map((pair, idx) => {
                     const isMatched = matchedPairs.includes(idx);
                     const isSelected =
-                      selectedMatch?.side === "right" && selectedMatch.idx === idx;
-                    const isError = matchError === idx && selectedMatch?.side === "left";
+                      selectedMatch?.side === "right" &&
+                      selectedMatch.idx === idx;
+                    const isError =
+                      matchError === idx &&
+                      selectedMatch?.side === "left";
                     return (
                       <button
                         key={`r-${idx}`}
                         onClick={() => handleMatchClick("right", idx)}
-                        disabled={isMatched || state.lastAnswerCorrect !== null}
+                        disabled={
+                          isMatched || state.lastAnswerCorrect !== null
+                        }
                         className="w-full py-3 px-2 font-vt text-xl transition-transform"
                         style={{
                           background: isMatched
@@ -878,7 +1257,11 @@ export function BattleScreen() {
                               : isError
                                 ? "var(--kq-attack)"
                                 : "var(--kq-panel-2)",
-                          border: `4px solid ${isMatched ? "var(--kq-correct)" : "var(--kq-panel-border)"}`,
+                          border: `4px solid ${
+                            isMatched
+                              ? "var(--kq-correct)"
+                              : "var(--kq-panel-border)"
+                          }`,
                           color: "var(--kq-panel-border)",
                           opacity: isMatched ? 0.5 : 1,
                         }}
@@ -893,20 +1276,22 @@ export function BattleScreen() {
           </div>
 
           {/* Hint */}
-          {currentQuestion.hint && !showHint && state.lastAnswerCorrect === null && (
-            <div className="text-center mt-4">
-              <button
-                onClick={() => {
-                  audio.click();
-                  setShowHint(true);
-                }}
-                className="font-pixel text-[0.5rem] underline"
-                style={{ color: "var(--kq-muted)" }}
-              >
-                💡 Butuh bantuan?
-              </button>
-            </div>
-          )}
+          {currentQuestion.hint &&
+            !showHint &&
+            state.lastAnswerCorrect === null && (
+              <div className="text-center mt-4">
+                <button
+                  onClick={() => {
+                    audio.click();
+                    setShowHint(true);
+                  }}
+                  className="font-pixel text-[0.5rem] underline"
+                  style={{ color: "var(--kq-muted)" }}
+                >
+                  💡 Butuh bantuan?
+                </button>
+              </div>
+            )}
           {showHint && currentQuestion.hint && (
             <div
               className="mt-3 p-2 text-center"
@@ -925,3 +1310,9 @@ export function BattleScreen() {
     </div>
   );
 }
+
+// Achievement lookup map
+import { ACHIEVEMENTS } from "@/lib/game/items";
+const ACHIEVEMENTS_MAP: Record<string, { id: string; name: string; icon: string; description: string }> = Object.fromEntries(
+  ACHIEVEMENTS.map((a) => [a.id, a]),
+);

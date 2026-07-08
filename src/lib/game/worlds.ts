@@ -12,11 +12,12 @@ export const WORLDS: World[] = [
     jlpt: "DASAR",
     tagline: "Desa Awal - Hutan Magis Tempat Aksara Tersembunyi",
     description:
-      "Petualangan dimulai! Di desa tersembunyi di tepi hutan magis, kamu akan mempelajari fondasi huruf Jepang: Hiragana & Katakana. Bertemu pemandu misterius, kalahkan monster huruf bayangan, dan kuasai 5 vokal hingga deret N, H, M, Y, R, W.",
+      "Petualangan dimulai! Di desa tersembunyi di tepi hutan magis, kamu akan mempelajari fondasi huruf Jepang: Hiragana & Katakana. Bab 1 (Hiragana) & Bab 2 (Katakana) - total 20 stage.",
     color: "var(--kq-hajimari)",
     colorDark: "var(--kq-hajimari-dark)",
     icon: "🍃",
-    stageCount: 10,
+    stageCount: 20,
+    chapterCount: 2,
   },
   {
     id: "n5",
@@ -25,11 +26,12 @@ export const WORLDS: World[] = [
     jlpt: "N5",
     tagline: "Kerajaan Lembah - Bertransaksi & Menyapa Penduduk",
     description:
-      "Kerajaan yang ramai di lembah subur. Mempelajari kosakata dasar, tata bahasa esensial, dan ~100 Kanji pertama. Bantu penduduk kota bertransaksi, menyapa, dan menjalankan kehidupan sehari-hari.",
+      "Kerajaan yang ramai di lembah subur. Mempelajari kosakata dasar, tata bahasa esensial, partikel, dan ~100 Kanji pertama. Bantu penduduk kota bertransaksi, menyapa, dan menjalankan kehidupan sehari-hari. 10 stage penuh!",
     color: "var(--kq-n5)",
     colorDark: "var(--kq-n5-dark)",
     icon: "🏰",
     stageCount: 10,
+    chapterCount: 1,
   },
   {
     id: "n4",

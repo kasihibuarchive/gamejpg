@@ -47,7 +47,8 @@ export interface BattleEnemy {
 export interface Stage {
   id: string; // e.g. "hajimari-1"
   worldId: WorldId;
-  index: number; // 1-10
+  index: number; // 1-20 (within world, can span chapters)
+  chapter?: number; // chapter number within world (1, 2, etc.)
   title: string;
   subtitle: string;
   type: "lesson" | "battle" | "mini-boss" | "boss";
@@ -80,7 +81,30 @@ export interface World {
   colorDark: string;
   icon: string; // emoji
   stageCount: number;
+  chapterCount?: number; // how many story arcs in this world
   locked?: boolean;
+}
+
+// ===== ITEMS SYSTEM =====
+export interface ItemDef {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  effect: "heal" | "fullheal" | "hint" | "shield" | "revive" | "damage";
+  value: number; // amount of effect (HP restored, damage dealt, etc.)
+  price: number; // shop price
+  consumable: boolean;
+}
+
+// ===== ACHIEVEMENTS =====
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  // condition checked against player state
+  check: (p: PlayerState, stats: GameStats) => boolean;
 }
 
 // ===== PLAYER STATE =====
@@ -91,10 +115,26 @@ export interface PlayerState {
   xpToNext: number;
   hp: number;
   maxHp: number;
+  coins: number; // currency for shop
   badges: string[];
-  items: string[];
+  items: string[]; // item IDs
+  itemCounts: Record<string, number>; // item id -> count
   completedStages: string[]; // stage IDs
   unlockedWorlds: WorldId[];
+  achievements: string[]; // unlocked achievement IDs
+}
+
+// ===== GAME STATS (for achievements) =====
+export interface GameStats {
+  totalCorrect: number;
+  totalWrong: number;
+  bestCombo: number;
+  stagesCleared: number;
+  bossesDefeated: number;
+  perfectStages: number; // stages with all correct
+  totalItemsUsed: number;
+  daysPlayed: number;
+  lastPlayedDate: string;
 }
 
 // ===== GAME VIEWS =====
@@ -106,4 +146,7 @@ export type GameView =
   | "battle"
   | "result"
   | "codex"
+  | "shop"
+  | "practice"
+  | "achievements"
   | "settings";
