@@ -8,6 +8,8 @@ const MENU_ITEMS = [
   { id: "hero", icon: "🧙", label: "Hero", desc: "Character sheet" },
   { id: "stats", icon: "⚙", label: "Stats & Ability", desc: "Upgrade & equip" },
   { id: "shop", icon: "🏪", label: "Toko", desc: "Beli ramuan & ability" },
+  { id: "endless", icon: "♾", label: "Endless Mode", desc: "Latihan vocab tanpa henti" },
+  { id: "vocabbook", icon: "📚", label: "Vocab Book", desc: "Kamus vocab terkumpul" },
   { id: "practice", icon: "🎯", label: "Latihan", desc: "Review soal" },
   { id: "achievements", icon: "🏆", label: "Achievement", desc: "Goals & stats" },
   { id: "codex", icon: "📜", label: "Codex", desc: "Kana & item" },

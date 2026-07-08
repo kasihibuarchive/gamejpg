@@ -943,9 +943,10 @@ export const HAJIMARI_STAGES: Stage[] = [
 
 import { KATAKANA_STAGES } from "./katakana-stages";
 import { N5_STAGES } from "./n5-stages";
+import { N4_STAGES } from "./n4-stages";
 
 export function getAllStages(): Stage[] {
-  return [...HAJIMARI_STAGES, ...KATAKANA_STAGES, ...N5_STAGES];
+  return [...HAJIMARI_STAGES, ...KATAKANA_STAGES, ...N5_STAGES, ...N4_STAGES];
 }
 
 export function getStagesByWorld(worldId: string): Stage[] {
@@ -960,12 +961,46 @@ export function getStage(id: string): Stage | undefined {
 
 // World unlock logic: which world does completing a boss stage unlock?
 export function getWorldUnlockForStage(stageId: string): WorldId | undefined {
-  if (stageId === "hajimari-10") return "n5"; // After Bab 1 (Hiragana)
-  // hajimari-20 (Katakana) also unlocks N5
-  if (stageId === "hajimari-20") return "n5";
-  if (stageId === "n5-10") return "n4"; // Future
-  if (stageId === "n4-10") return "n3";
+  if (stageId === "hajimari-10" || stageId === "hajimari-20") return "n5";
+  if (stageId === "n5-10") return "n4";
+  if (stageId === "n4-10" || stageId === "n4-20") return "n3";
   if (stageId === "n3-10") return "n2";
   if (stageId === "n2-10") return "n1";
   return undefined;
+}
+
+// Vocab collection: extract all vocab from lesson rows
+export interface VocabEntry {
+  kana: string;
+  romaji: string;
+  meaning: string;
+  sourceStageId: string;
+  sourceStageTitle: string;
+  worldId: WorldId;
+}
+
+export function getAllVocab(): VocabEntry[] {
+  const vocab: VocabEntry[] = [];
+  for (const stage of getAllStages()) {
+    if (stage.lesson) {
+      for (const row of stage.lesson.rows) {
+        if (row.meaning) {
+          vocab.push({
+            kana: row.kana,
+            romaji: row.romaji,
+            meaning: row.meaning,
+            sourceStageId: stage.id,
+            sourceStageTitle: stage.title,
+            worldId: stage.worldId,
+          });
+        }
+      }
+    }
+  }
+  return vocab;
+}
+
+// Vocab collected by player (only from completed stages)
+export function getPlayerVocab(completedStages: string[]): VocabEntry[] {
+  return getAllVocab().filter((v) => completedStages.includes(v.sourceStageId));
 }

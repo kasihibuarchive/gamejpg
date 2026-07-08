@@ -243,4 +243,6 @@ export type GameView =
   | "achievements"
   | "stats"
   | "hero"
+  | "endless"
+  | "vocabbook"
   | "settings";

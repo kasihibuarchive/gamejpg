@@ -15,6 +15,8 @@ import { Practice } from "@/components/game/Practice";
 import { Achievements } from "@/components/game/Achievements";
 import { StatsScreen } from "@/components/game/StatsScreen";
 import { HeroScreen } from "@/components/game/HeroScreen";
+import { EndlessMode } from "@/components/game/EndlessMode";
+import { VocabBook } from "@/components/game/VocabBook";
 
 export default function Page() {
   const { view, soundEnabled, crtEnabled } = useGame();
@@ -61,6 +63,8 @@ export default function Page() {
         {view === "achievements" && <Achievements />}
         {view === "stats" && <StatsScreen />}
         {view === "hero" && <HeroScreen />}
+        {view === "endless" && <EndlessMode />}
+        {view === "vocabbook" && <VocabBook />}
       </main>
     </div>
   );

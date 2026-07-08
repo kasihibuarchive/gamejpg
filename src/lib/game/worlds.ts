@@ -40,11 +40,12 @@ export const WORLDS: World[] = [
     jlpt: "N4",
     tagline: "Pelabuhan Transaksi - Bernegosiasi & Berlayar",
     description:
-      "Pelabuhan ramai tempat pedagang dari seluruh negeri berkumpul. Percakapan sehari-hari, konjugasi kata kerja, dan ~300 Kanji. Negosiasikan harga dengan pelaut, perbaiki kapal, dan jelajahi pulau baru.",
+      "Pelabuhan ramai tempat pedagang dari seluruh negeri berkumpul. Percakapan sehari-hari, konjugasi kata kerja (te/nai/ta-form), partikel kompleks, dan ~300 Kanji. Bab 1 (Stage 1-10): Verb forms & daily life. Bab 2 (Stage 11-20): Kanji lanjutan & grammar kompleks. Negosiasikan harga, perbaiki kapal, jelajahi pulau baru.",
     color: "var(--kq-n4)",
     colorDark: "var(--kq-n4-dark)",
     icon: "⚓",
-    stageCount: 10,
+    stageCount: 20,
+    chapterCount: 2,
   },
   {
     id: "n3",
