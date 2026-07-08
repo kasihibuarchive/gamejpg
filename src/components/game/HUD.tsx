@@ -1,8 +1,17 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { useGame } from "@/lib/game/store";
-import { StatBar } from "./PixelUI";
 import { audio } from "@/lib/game/audio";
+
+const MENU_ITEMS = [
+  { id: "hero", icon: "🧙", label: "Hero", desc: "Character sheet" },
+  { id: "stats", icon: "⚙", label: "Stats & Ability", desc: "Upgrade & equip" },
+  { id: "shop", icon: "🏪", label: "Toko", desc: "Beli ramuan & ability" },
+  { id: "practice", icon: "🎯", label: "Latihan", desc: "Review soal" },
+  { id: "achievements", icon: "🏆", label: "Achievement", desc: "Goals & stats" },
+  { id: "codex", icon: "📜", label: "Codex", desc: "Kana & item" },
+] as const;
 
 export function HUD() {
   const {
@@ -15,19 +24,41 @@ export function HUD() {
     view,
   } = useGame();
 
-  // Don't show full HUD on title screen (handled separately)
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [menuOpen]);
+
+  // Don't show full HUD on title screen
   if (view === "title") return null;
+
+  const handleMenuClick = (targetView: typeof MENU_ITEMS[number]["id"]) => {
+    audio.click();
+    setView(targetView as any);
+    setMenuOpen(false);
+  };
 
   return (
     <header
-      className="sticky top-0 z-50 px-2 py-2 md:px-4 md:py-2"
+      className="sticky top-0 z-50 px-3 py-2 md:px-4 md:py-2"
       style={{
         background: "var(--kq-bg-2)",
         borderBottom: "4px solid var(--kq-panel-border)",
       }}
     >
       <div className="max-w-6xl mx-auto flex items-center gap-2 md:gap-3 flex-wrap">
-        {/* Logo / Title */}
+        {/* Logo / Title - clickable to world map */}
         <button
           onClick={() => {
             audio.click();
@@ -53,49 +84,46 @@ export function HUD() {
           </span>
         </button>
 
-        {/* Player info */}
-        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+        {/* Player quick stats - compact */}
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {/* Level badge */}
           <div
-            className="px-2 py-1 shrink-0"
+            className="px-2 py-1 shrink-0 text-center"
             style={{
               background: "var(--kq-bg-3)",
               border: "2px solid var(--kq-fg)",
             }}
           >
-            <div className="font-pixel text-[0.4rem] text-center opacity-70 text-white">
-              LV
+            <div className="font-pixel text-[0.4rem] text-white/70">LV</div>
+            <div className="font-pixel text-xs text-white">{player.level}</div>
+          </div>
+
+          {/* HP bar - compact */}
+          <div className="min-w-0 flex-1 max-w-[140px]">
+            <div className="flex items-center gap-1 mb-0.5">
+              <span className="font-pixel text-[0.4rem] text-white/70">HP</span>
+              <div
+                className="flex-1 h-2"
+                style={{
+                  background: "var(--kq-bg-3)",
+                  border: "1px solid var(--kq-fg)",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${(player.hp / player.maxHp) * 100}%`,
+                    height: "100%",
+                    background: "var(--kq-hp)",
+                  }}
+                />
+              </div>
             </div>
-            <div className="font-pixel text-xs md:text-sm text-center text-white">
-              {player.level}
+            <div className="font-vt text-xs text-white/80 leading-none">
+              {player.hp}/{player.maxHp} HP
             </div>
           </div>
 
-          <div className="min-w-0 flex-1 max-w-[120px] md:max-w-xs">
-            <div className="font-vt text-sm md:text-base leading-none mb-0.5 truncate text-white">
-              {player.name}
-            </div>
-            <StatBar
-              current={player.hp}
-              max={player.maxHp}
-              color="var(--kq-hp)"
-              label="HP"
-              height={8}
-              showNumbers={false}
-            />
-          </div>
-
-          <div className="hidden sm:block min-w-[70px] max-w-[100px]">
-            <StatBar
-              current={player.xp}
-              max={player.xpToNext}
-              color="var(--kq-xp)"
-              label="XP"
-              height={8}
-              showNumbers={false}
-            />
-          </div>
-
-          {/* Coins */}
+          {/* Coins - compact */}
           <div
             className="px-2 py-1 shrink-0 flex items-center gap-1"
             style={{
@@ -103,183 +131,170 @@ export function HUD() {
               border: "2px solid var(--kq-panel-border)",
             }}
           >
-            <span className="text-xs md:text-sm">💰</span>
-            <span
-              className="font-pixel text-[0.55rem] md:text-xs text-black"
-            >
+            <span className="text-xs">💰</span>
+            <span className="font-pixel text-[0.5rem] text-black">
               {player.coins}
             </span>
           </div>
         </div>
 
-        {/* Quick actions - shop, achievements, practice, codex */}
-        <div className="flex items-center gap-1 shrink-0">
-          {/* Hero button - dedicated character sheet */}
+        {/* MENU BUTTON - opens dropdown */}
+        <div className="relative shrink-0" ref={menuRef}>
           <button
             onClick={() => {
               audio.click();
-              setView("hero" as any);
+              setMenuOpen(!menuOpen);
             }}
-            className="p-2 hover:opacity-80 relative"
+            className="px-3 py-2 flex items-center gap-2"
             style={{
-              background:
-                view === "hero" ? "var(--kq-accent)" : "var(--kq-n3)",
+              background: menuOpen ? "var(--kq-accent)" : "var(--kq-n3)",
               border: "2px solid var(--kq-fg)",
-              color: view === "hero" ? "black" : "white",
+              color: "white",
             }}
-            aria-label="Hero - Character Sheet"
-            title="Hero - Character Sheet"
+            aria-label="Buka menu"
+            aria-expanded={menuOpen}
           >
-            <span className="font-pixel text-[0.5rem]">🧙</span>
+            <span className="font-pixel text-[0.6rem]">☰ MENU</span>
             {player.statPoints > 0 && (
               <span
-                className="absolute -top-1 -right-1 font-pixel text-[0.4rem] px-1 py-0.5 kq-blink"
+                className="font-pixel text-[0.4rem] px-1 py-0.5 kq-blink"
                 style={{
                   background: "var(--kq-attack)",
                   color: "white",
-                  border: "1px solid var(--kq-panel-border)",
+                  border: "1px solid white",
                 }}
               >
                 {player.statPoints}
               </span>
             )}
           </button>
-          <button
-            onClick={() => {
-              audio.click();
-              setView("practice");
-            }}
-            className="p-2 hover:opacity-80"
-            style={{
-              background:
-                view === "practice" ? "var(--kq-accent)" : "var(--kq-bg-3)",
-              border: "2px solid var(--kq-fg)",
-              color: view === "practice" ? "black" : "var(--kq-fg)",
-            }}
-            aria-label="Mode Latihan"
-            title="Mode Latihan"
-          >
-            <span className="font-pixel text-[0.5rem]">🎯</span>
-          </button>
-          <button
-            onClick={() => {
-              audio.click();
-              setView("shop");
-            }}
-            className="p-2 hover:opacity-80"
-            style={{
-              background:
-                view === "shop" ? "var(--kq-accent)" : "var(--kq-bg-3)",
-              border: "2px solid var(--kq-fg)",
-              color: view === "shop" ? "black" : "var(--kq-fg)",
-            }}
-            aria-label="Toko"
-            title="Toko Ramuan"
-          >
-            <span className="font-pixel text-[0.5rem]">🏪</span>
-          </button>
-          <button
-            onClick={() => {
-              audio.click();
-              setView("achievements");
-            }}
-            className="p-2 hover:opacity-80"
-            style={{
-              background:
-                view === "achievements"
-                  ? "var(--kq-accent)"
-                  : "var(--kq-bg-3)",
-              border: "2px solid var(--kq-fg)",
-              color: view === "achievements" ? "black" : "var(--kq-fg)",
-            }}
-            aria-label="Achievement"
-            title="Achievement"
-          >
-            <span className="font-pixel text-[0.5rem]">🏆</span>
-          </button>
-          <button
-            onClick={() => {
-              audio.click();
-              setView("codex");
-            }}
-            className="p-2 hover:opacity-80"
-            style={{
-              background:
-                view === "codex" ? "var(--kq-accent)" : "var(--kq-bg-3)",
-              border: "2px solid var(--kq-fg)",
-              color: view === "codex" ? "black" : "var(--kq-fg)",
-            }}
-            aria-label="Codex"
-            title="Codex"
-          >
-            <span className="font-pixel text-[0.5rem]">📜</span>
-          </button>
-          <button
-            onClick={() => {
-              audio.click();
-              toggleSound();
-              audio.setMuted(soundEnabled);
-            }}
-            className="p-2 hover:opacity-80"
-            style={{
-              background: "var(--kq-bg-3)",
-              border: "2px solid var(--kq-fg)",
-              color: "var(--kq-fg)",
-            }}
-            aria-label="Toggle sound"
-            title={soundEnabled ? "Sound: ON" : "Sound: OFF"}
-          >
-            <span className="font-pixel text-[0.5rem]">
-              {soundEnabled ? "🔊" : "🔇"}
-            </span>
-          </button>
-          <button
-            onClick={() => {
-              audio.click();
-              toggleCrt();
-            }}
-            className="p-2 hover:opacity-80 hidden sm:block"
-            style={{
-              background: "var(--kq-bg-3)",
-              border: "2px solid var(--kq-fg)",
-              color: "var(--kq-fg)",
-            }}
-            aria-label="Toggle CRT effect"
-            title="CRT Effect"
-          >
-            <span className="font-pixel text-[0.5rem]">📺</span>
-          </button>
-          {/* Stats & Abilities button - with badge for stat points */}
-          <button
-            onClick={() => {
-              audio.click();
-              setView("stats" as any);
-            }}
-            className="p-2 hover:opacity-80 relative"
-            style={{
-              background:
-                view === "stats" ? "var(--kq-accent)" : "var(--kq-bg-3)",
-              border: "2px solid var(--kq-fg)",
-              color: view === "stats" ? "black" : "var(--kq-fg)",
-            }}
-            aria-label="Stats & Abilities"
-            title="Stats & Abilities"
-          >
-            <span className="font-pixel text-[0.5rem]">⚙</span>
-            {player.statPoints > 0 && (
-              <span
-                className="absolute -top-1 -right-1 font-pixel text-[0.4rem] px-1 py-0.5 kq-blink"
+
+          {/* Dropdown menu */}
+          {menuOpen && (
+            <div
+              className="absolute right-0 top-full mt-1 min-w-[220px] z-50 kq-pop"
+              style={{
+                background: "var(--kq-panel)",
+                border: "4px solid var(--kq-panel-border)",
+                boxShadow:
+                  "0 0 0 4px var(--kq-panel), 0 0 0 8px var(--kq-panel-border), 6px 6px 0 rgba(0,0,0,0.5)",
+              }}
+            >
+              {/* Menu items */}
+              {MENU_ITEMS.map((item) => {
+                const isActive = view === item.id;
+                const showBadge = item.id === "stats" && player.statPoints > 0;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleMenuClick(item.id)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:opacity-90"
+                    style={{
+                      background: isActive
+                        ? "var(--kq-accent)"
+                        : "transparent",
+                      borderBottom: "2px solid var(--kq-panel-border)",
+                      color: "var(--kq-panel-border)",
+                    }}
+                  >
+                    <span className="text-xl shrink-0">{item.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-pixel text-[0.55rem] truncate">
+                        {item.label}
+                      </div>
+                      <div className="font-vt text-xs text-black/60 truncate">
+                        {item.desc}
+                      </div>
+                    </div>
+                    {showBadge && (
+                      <span
+                        className="font-pixel text-[0.4rem] px-1.5 py-0.5 kq-blink shrink-0"
+                        style={{
+                          background: "var(--kq-attack)",
+                          color: "white",
+                          border: "1px solid var(--kq-panel-border)",
+                        }}
+                      >
+                        {player.statPoints} PTS
+                      </span>
+                    )}
+                    {isActive && (
+                      <span className="font-pixel text-[0.5rem] shrink-0">✓</span>
+                    )}
+                  </button>
+                );
+              })}
+
+              {/* Settings row */}
+              <div
+                className="flex items-center gap-2 px-3 py-2"
                 style={{
-                  background: "var(--kq-attack)",
-                  color: "white",
-                  border: "1px solid var(--kq-panel-border)",
-                  borderRadius: 0,
+                  background: "var(--kq-panel-2)",
+                  borderBottom: "2px solid var(--kq-panel-border)",
                 }}
               >
-                {player.statPoints}
-              </span>
-            )}
-          </button>
+                <span className="font-pixel text-[0.5rem] text-black/70 shrink-0">
+                  ⚙ SETTING:
+                </span>
+                <button
+                  onClick={() => {
+                    audio.click();
+                    toggleSound();
+                    audio.setMuted(soundEnabled);
+                  }}
+                  className="px-2 py-1 flex items-center gap-1"
+                  style={{
+                    background: soundEnabled
+                      ? "var(--kq-correct)"
+                      : "var(--kq-muted)",
+                    border: "2px solid var(--kq-panel-border)",
+                  }}
+                  title={soundEnabled ? "Sound: ON" : "Sound: OFF"}
+                >
+                  <span className="text-sm">{soundEnabled ? "🔊" : "🔇"}</span>
+                  <span className="font-pixel text-[0.4rem] text-black">
+                    {soundEnabled ? "ON" : "OFF"}
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    audio.click();
+                    toggleCrt();
+                  }}
+                  className={`px-2 py-1 flex items-center gap-1 ${crtEnabled ? "" : "opacity-50"}`}
+                  style={{
+                    background: crtEnabled
+                      ? "var(--kq-n4)"
+                      : "var(--kq-muted)",
+                    border: "2px solid var(--kq-panel-border)",
+                  }}
+                  title="CRT Effect"
+                >
+                  <span className="text-sm">📺</span>
+                  <span className="font-pixel text-[0.4rem] text-black">
+                    {crtEnabled ? "ON" : "OFF"}
+                  </span>
+                </button>
+              </div>
+
+              {/* World map shortcut */}
+              <button
+                onClick={() => {
+                  audio.click();
+                  setView("world-map");
+                  setMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:opacity-90"
+                style={{
+                  background: "var(--kq-bg-2)",
+                  color: "var(--kq-accent)",
+                }}
+              >
+                <span className="text-xl shrink-0">🗺</span>
+                <span className="font-pixel text-[0.55rem]">PETA DUNIA</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

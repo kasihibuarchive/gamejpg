@@ -66,11 +66,11 @@ export function BattleScreen() {
     setView,
     setLastResult,
     completeStage,
-    damagePlayer,
     consumeItem,
     hasItem,
     recordAnswer,
     recordStageLoss,
+    healPlayer,
     player,
     stats,
   } = useGame();
@@ -174,12 +174,15 @@ export function BattleScreen() {
     };
   }, [stage?.type]);
 
-  // Save player HP at battle start
+  // Save player HP at battle start (only when stage changes)
+  // Use ref to avoid re-saving when player.hp changes during battle
+  const stageIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (stage) {
+    if (stage && stageIdRef.current !== stage.id) {
+      stageIdRef.current = stage.id;
       sessionStorage.setItem(INITIAL_PLAYER_HP_KEY, String(player.hp));
     }
-  }, [stage?.id, player.hp]);
+  }, [stage]);
 
   const currentEnemy = scaledEnemy;
   const currentQuestion: Question | undefined = battleQuestions[state.questionIdx];
@@ -217,6 +220,16 @@ export function BattleScreen() {
       audio.victory();
     } else {
       audio.gameOver();
+      // On defeat: restore store HP from snapshot (so retry/map shows correct HP)
+      const snapshotHp = parseInt(
+        sessionStorage.getItem(INITIAL_PLAYER_HP_KEY) || String(player.hp),
+        10,
+      );
+      const currentStoreHp = player.hp;
+      const diff = snapshotHp - currentStoreHp;
+      if (diff > 0) {
+        healPlayer(diff);
+      }
       // Record loss for mercy mechanic
       if (stage) recordStageLoss(stage.id);
     }
@@ -381,7 +394,12 @@ export function BattleScreen() {
         : { damage: 0, isFast: false, isSlow: false, isCrit: false, isDoubleStrike: false, timingMult: 1 };
       const { damage: dmgToEnemyBase, isFast, isSlow, isCrit, isDoubleStrike } = playerDamageResult;
       // Double strike: deal damage twice
-      const dmgToEnemy = isDoubleStrike ? dmgToEnemyBase * 2 : dmgToEnemyBase;
+      let dmgToEnemy = isDoubleStrike ? dmgToEnemyBase * 2 : dmgToEnemyBase;
+      // CAP damage: max 2x the "fair share" per hit to prevent instakill
+      // Fair share = enemyMaxHp / numQuestions. Cap at 2x that.
+      const fairShare = Math.ceil(enemy.scaledHp / numQuestions);
+      const dmgCap = fairShare * 2;
+      dmgToEnemy = Math.min(dmgToEnemy, dmgCap);
 
       // Process enemy turn (abilities trigger) - with player DEF reduction
       const enemyTurn = processEnemyTurn(
@@ -521,10 +539,10 @@ export function BattleScreen() {
         setState((s) => ({ ...s, comboText: null, enemyActionText: null }));
       }, 1500);
 
-      // Sync store player HP
-      if (totalPlayerDmg > 0) {
-        damagePlayer(totalPlayerDmg);
-      }
+      // NOTE: Do NOT sync damage to store during battle.
+      // Local state.playerHp is source of truth during battle.
+      // Store HP only syncs at battle end (victory restores full, defeat uses snapshot for retry).
+      // This fixes the "Coba Lagi" bug where HP wasn't resetting properly.
 
       // Clear animation flags
       setTimeout(() => {
@@ -589,7 +607,6 @@ export function BattleScreen() {
       hasThorns,
       hasTimeFreeze,
       hasScholar,
-      damagePlayer,
       showFloatingDamage,
       recordAnswer,
       recordStageLoss,
@@ -895,10 +912,17 @@ export function BattleScreen() {
                   onClick={() => {
                     audio.click();
                     endedRef.current = false;
+                    // Restore HP from snapshot (taken at battle start), not from store
+                    // Store HP may have been damaged during previous battle attempt
+                    const snapshotHp = parseInt(
+                      sessionStorage.getItem(INITIAL_PLAYER_HP_KEY) || String(player.hp),
+                      10,
+                    );
+                    const fullHp = Math.min(snapshotHp, playerEffect.effectiveMaxHp);
                     setState({
                       enemyHp: scaledEnemy?.scaledHp ?? 1,
                       enemyMaxHp: scaledEnemy?.scaledHp ?? 1,
-                      playerHp: Math.min(player.hp, playerEffect.effectiveMaxHp),
+                      playerHp: fullHp,
                       questionIdx: 0,
                       totalCorrect: 0,
                       combo: 0,

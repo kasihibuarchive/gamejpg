@@ -256,16 +256,16 @@ export function computePlayerDamage(
   let isSlow = false;
 
   if (timePct >= 0.7) {
-    timingMult = SCALING.fastBonus;
+    timingMult = 1.3; // reduced from 1.8
     isFast = true;
   } else if (timePct <= 0.3) {
-    timingMult = SCALING.slowPenalty;
+    timingMult = 0.7; // reduced penalty from 0.5
     isSlow = true;
   }
 
-  // Combo bonus: +10% per combo, max +50%
-  let comboBonus = Math.min(combo * 0.1, 0.5);
-  // Combo master ability: doubles combo bonus
+  // Combo bonus: +5% per combo, max +25% (was 10%/50%)
+  let comboBonus = Math.min(combo * 0.05, 0.25);
+  // Combo master ability: doubles combo bonus (max 50%)
   if (hasPerk(equippedAbilities, "combo_master")) {
     comboBonus = comboBonus * 2;
   }
@@ -282,14 +282,14 @@ export function computePlayerDamage(
   // Player ATK stat multiplier
   const atkMult = playerEffect.damageMult;
 
-  // Executioner ability: +100% damage to enemies below 30% HP
+  // Executioner ability: +50% damage to enemies below 30% HP (was 100%)
   let execMult = 1;
   if (hasPerk(equippedAbilities, "executioner") && enemyCurrentHp <= enemyMaxHp * 0.3) {
-    execMult = 2;
+    execMult = 1.5;
   }
 
-  // Double strike: 20% chance to deal damage twice (handled separately)
-  const isDoubleStrike = hasPerk(equippedAbilities, "double_strike") && Math.random() < 0.2;
+  // Double strike: 15% chance to deal damage twice (was 20%)
+  const isDoubleStrike = hasPerk(equippedAbilities, "double_strike") && Math.random() < 0.15;
 
   const damage = Math.ceil(
     baseDamage * timingMult * comboMult * critMult * atkMult * execMult,
