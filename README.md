@@ -31,16 +31,20 @@ Petualangan epik mempelajari bahasa Jepang dalam dunia RPG 8-bit yang dikemas mo
 - Review soal dari stage yang sudah selesai
 - Pilih 5/10/20 soal acak, tanpa tekanan HP
 
-### ⚔️ Battle System (Game-Challenging!)
-- **Enemy Scaling**: HP & ATK musuh naik seiring level pemain & stage progress
+### ⚔️ Battle System (Dicero-Style RPG!)
+- **Stage-Based Scaling**: HP musuh +16%/stage, ATK +12%/stage (steeper progression, no difficulty selector)
+- **Player Stats (Upgradeable)**: ATK (+10% dmg/pt), DEF (-8% taken/pt), SPD (+0.5s timer/pt), LUCK (+3% crit/pt)
+- **Stat Points**: +3 points per level up - allocate di Stats screen
+- **15 Equipable Abilities** (Dicero-style perks, maks 3 dipasang):
+  - 🦇 Vampir, 👹 Berserker, 🍀 Lucky Charm, 👟 Swift Boots, 🛡️ Iron Shield
+  - 🤓 Scholar, 🌵 Thorns, 🪓 Executioner, ⏸ Time Freeze, 💍 Combo Master
+  - 💚 Regen, 🔰 Shield Start, 👊 Double Strike, 💰 Golden Touch, 🔮 XP Boost
 - **9 Enemy Abilities**: Heal, Crit, Shield, Multi-Attack, Enrage, Regen, Poison, Time-Pressure, Counter
-- **Timer per Question**: 20s (easy) / 15s (normal) / 10s (hard) - jawab cepat = bonus damage!
+- **Timer per Question**: 15s base + SPD/SPD bonuses
 - **Question Randomization**: Urutan soal & opsi jawaban diacak tiap battle
-- **Expanded Question Pool**: Auto-generate soal variasi dari lesson content
-- **Critical Hits**: 15% peluang damage 2x untuk pemain, musuh juga bisa crit
+- **Critical Hits**: Base 10% + LUCK stat + abilities
 - **Boss Phases**: Boss mengamuk (enrage) di bawah 30% HP, +50% damage
-- **Combo System**: Streak jawaban benar = damage bonus (max +50%)
-- **3 Difficulty Modes**: Easy / Normal / Hard - bisa diganti kapan saja di HUD
+- **Combo System**: Streak jawaban benar = damage bonus (max +50%, doubled with Combo Master)
 - **Mercy Mechanic**: Kalah 3x di stage yang sama = auto-heal 30% HP
 
 ## 📚 Konten Materi

@@ -42,7 +42,13 @@ export function Shop() {
   };
 
   // Get all consumable items available in shop
-  const shopItems = Object.values(ITEMS).filter((i) => i.price > 0);
+  // Split into consumables and abilities
+  const consumableItems = Object.values(ITEMS).filter(
+    (i) => i.price > 0 && i.type === "consumable",
+  );
+  const abilityItems = Object.values(ITEMS).filter(
+    (i) => i.price > 0 && i.type === "ability",
+  );
 
   return (
     <div
@@ -90,9 +96,15 @@ export function Shop() {
           </div>
         </div>
 
-        {/* Shop grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {shopItems.map((item) => {
+        {/* Consumables section */}
+        <h3
+          className="font-pixel text-sm mb-3 mt-2"
+          style={{ color: "var(--kq-accent)" }}
+        >
+          🧪 RAMUAN (CONSUMABLE)
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          {consumableItems.map((item) => {
             const owned = player.itemCounts[item.id] || 0;
             const canAfford = player.coins >= item.price;
             const isFlash = flash === item.id;
@@ -125,7 +137,6 @@ export function Shop() {
                   </div>
                 </div>
 
-                {/* Stats */}
                 <div
                   className="p-2 mb-3"
                   style={{
@@ -149,7 +160,6 @@ export function Shop() {
                   </div>
                 </div>
 
-                {/* Buy button */}
                 <button
                   onClick={() => handleBuy(item.id)}
                   disabled={!canAfford}
@@ -164,6 +174,95 @@ export function Shop() {
                 >
                   💰 BELI ({item.price})
                 </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Abilities section */}
+        <h3
+          className="font-pixel text-sm mb-3"
+          style={{ color: "var(--kq-n3)" }}
+        >
+          🎭 ABILITY (EQUIPABLE PERK) - maks 3 dipasang
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {abilityItems.map((item) => {
+            const owned = player.items.includes(item.id);
+            const equipped = player.equippedAbilities.includes(item.id);
+            const canAfford = player.coins >= item.price;
+            const isFlash = flash === item.id;
+            return (
+              <div
+                key={item.id}
+                className={`p-4 flex flex-col ${isFlash ? "kq-pop" : ""}`}
+                style={{
+                  background: owned ? "var(--kq-accent)" : "var(--kq-panel)",
+                  border: `4px solid ${equipped ? "var(--kq-correct)" : "var(--kq-panel-border)"}`,
+                  boxShadow: "0 0 0 4px var(--kq-panel), 0 0 0 8px var(--kq-panel-border), 4px 4px 0 rgba(0,0,0,0.4)",
+                }}
+              >
+                <div className="flex items-start gap-3 mb-3">
+                  <div
+                    className="text-4xl shrink-0"
+                    style={{
+                      filter: "drop-shadow(2px 2px 0 rgba(0,0,0,0.3))",
+                    }}
+                  >
+                    {item.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-pixel text-[0.6rem] text-black mb-1">
+                      {item.name}
+                    </div>
+                    <p className="font-vt text-sm text-black/80">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  className="p-2 mb-3"
+                  style={{
+                    background: "var(--kq-panel-2)",
+                    border: "2px solid var(--kq-panel-border)",
+                  }}
+                >
+                  <div className="font-vt text-sm text-black flex justify-between">
+                    <span>Status:</span>
+                    <span className="font-pixel text-[0.45rem]">
+                      {equipped ? "✓ TERPASANG" : owned ? "MILIK" : "BELUM"}
+                    </span>
+                  </div>
+                </div>
+
+                {!owned ? (
+                  <button
+                    onClick={() => handleBuy(item.id)}
+                    disabled={!canAfford}
+                    className="kq-btn w-full text-sm"
+                    style={{
+                      background: canAfford
+                        ? "var(--kq-n3)"
+                        : "var(--kq-muted)",
+                      color: "white",
+                      opacity: canAfford ? 1 : 0.7,
+                    }}
+                  >
+                    💰 BELI ({item.price})
+                  </button>
+                ) : (
+                  <div
+                    className="font-pixel text-[0.5rem] text-center p-2"
+                    style={{
+                      background: "var(--kq-correct)",
+                      color: "white",
+                      border: "2px solid var(--kq-panel-border)",
+                    }}
+                  >
+                    ✓ MILIK - PASANG DI ⚙ STATUS
+                  </div>
+                )}
               </div>
             );
           })}

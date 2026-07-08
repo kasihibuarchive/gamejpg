@@ -2,15 +2,13 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { GameView, PlayerState, WorldId, GameStats } from "./types";
+import type { GameView, PlayerState, WorldId, GameStats, AbilityPerk } from "./types";
 import { ITEMS, checkNewAchievements } from "./items";
 
 interface GameState {
-  // View routing
   view: GameView;
   selectedWorldId: WorldId | null;
   selectedStageId: string | null;
-  // Last battle result
   lastResult: {
     stageId: string;
     victory: boolean;
@@ -24,16 +22,11 @@ interface GameState {
     achievementsGained: string[];
   } | null;
 
-  // Player state
   player: PlayerState;
-  // Game stats (for achievements)
   stats: GameStats;
-
-  // Settings
   soundEnabled: boolean;
   crtEnabled: boolean;
 
-  // Actions
   setView: (v: GameView) => void;
   selectWorld: (id: WorldId) => void;
   selectStage: (id: string) => void;
@@ -49,7 +42,7 @@ interface GameState {
     restoreHp?: boolean;
     bestCombo?: number;
     correctCount?: number;
-  }) => string[]; // returns new achievement IDs
+  }) => string[];
   damagePlayer: (amount: number) => void;
   healPlayer: (amount: number) => void;
   resetPlayer: () => void;
@@ -57,20 +50,19 @@ interface GameState {
   toggleCrt: () => void;
   setPlayerName: (name: string) => void;
 
-  // Shop
   buyItem: (itemId: string) => boolean;
   consumeItem: (itemId: string) => "heal" | "fullheal" | "hint" | "shield" | "damage" | null;
   hasItem: (itemId: string) => boolean;
 
-  // Stats
+  allocateStat: (stat: "atk" | "def" | "spd" | "luck") => void;
+  equipAbility: (itemId: string) => boolean;
+  unequipAbility: (itemId: string) => void;
+
   recordAnswer: (correct: boolean) => void;
   recordCombo: (combo: number) => void;
   recordBossDefeat: () => void;
   recordPerfectStage: () => void;
   recordItemUsed: () => void;
-
-  // Difficulty
-  setDifficulty: (d: "easy" | "normal" | "hard") => void;
   recordStageLoss: (stageId: string) => void;
 }
 
@@ -81,14 +73,19 @@ const INITIAL_PLAYER: PlayerState = {
   xpToNext: 100,
   hp: 20,
   maxHp: 20,
-  coins: 50,
+  coins: 80,
   badges: [],
   items: [],
   itemCounts: {},
   completedStages: [],
   unlockedWorlds: ["hajimari"],
   achievements: [],
-  difficulty: "normal",
+  statPoints: 0,
+  atk: 0,
+  def: 0,
+  spd: 0,
+  luck: 0,
+  equippedAbilities: [],
   stageLosses: {},
 };
 
@@ -138,26 +135,25 @@ export const useGame = create<GameState>()(
         if (!player.completedStages.includes(stageId)) {
           player.completedStages.push(stageId);
           stats.stagesCleared += 1;
-          if (correctCount > 0) {
-            // will be set externally
-          }
         }
         player.xp += xp;
         player.coins += coins;
 
-        // Level up
         while (player.xp >= player.xpToNext) {
           player.xp -= player.xpToNext;
           player.level += 1;
           player.xpToNext = Math.floor(player.xpToNext * 1.4);
           player.maxHp += 5;
+          player.statPoints += 3;
           if (restoreHp !== false) player.hp = player.maxHp;
-          // Bonus coins on level up
           player.coins += 20 * player.level;
         }
         for (const item of items) {
           if (!player.items.includes(item)) player.items.push(item);
-          player.itemCounts[item] = (player.itemCounts[item] || 0) + 1;
+          const def = ITEMS[item];
+          if (def?.type === "consumable") {
+            player.itemCounts[item] = (player.itemCounts[item] || 0) + 1;
+          }
         }
         for (const badge of badges) {
           if (!player.badges.includes(badge)) player.badges.push(badge);
@@ -169,11 +165,9 @@ export const useGame = create<GameState>()(
           player.hp = player.maxHp;
         }
 
-        // Update stats
         if (bestCombo > stats.bestCombo) stats.bestCombo = bestCombo;
         if (badges.length > 0) stats.bossesDefeated += 1;
 
-        // Check achievements
         const newAchievements = checkNewAchievements(player, stats);
         for (const id of newAchievements) {
           if (!player.achievements.includes(id)) {
@@ -223,14 +217,16 @@ export const useGame = create<GameState>()(
         if (player.coins < def.price) return false;
         player.coins -= def.price;
         if (!player.items.includes(itemId)) player.items.push(itemId);
-        player.itemCounts[itemId] = (player.itemCounts[itemId] || 0) + 1;
+        if (def.type === "consumable") {
+          player.itemCounts[itemId] = (player.itemCounts[itemId] || 0) + 1;
+        }
         set({ player });
         return true;
       },
 
       consumeItem: (itemId) => {
         const def = ITEMS[itemId];
-        if (!def || !def.consumable) return null;
+        if (!def || def.type !== "consumable") return null;
         const player = { ...get().player };
         const count = player.itemCounts[itemId] || 0;
         if (count <= 0) return null;
@@ -238,12 +234,13 @@ export const useGame = create<GameState>()(
         player.itemCounts[itemId] = count - 1;
         if (player.itemCounts[itemId] <= 0) {
           delete player.itemCounts[itemId];
-          player.items = player.items.filter((i) => i !== itemId);
+          if (def.price > 0) {
+            player.items = player.items.filter((i) => i !== itemId);
+          }
         }
 
-        // Apply effect
         if (def.effect === "heal") {
-          player.hp = Math.min(player.maxHp, player.hp + def.value);
+          player.hp = Math.min(player.maxHp, player.hp + (def.value ?? 0));
         } else if (def.effect === "fullheal") {
           player.hp = player.maxHp;
         }
@@ -256,7 +253,41 @@ export const useGame = create<GameState>()(
 
       hasItem: (itemId) => {
         const player = get().player;
-        return (player.itemCounts[itemId] || 0) > 0;
+        const def = ITEMS[itemId];
+        if (!def) return false;
+        if (def.type === "consumable") {
+          return (player.itemCounts[itemId] || 0) > 0;
+        }
+        return player.items.includes(itemId);
+      },
+
+      allocateStat: (stat) => {
+        const player = { ...get().player };
+        if (player.statPoints <= 0) return;
+        if (stat === "atk") player.atk += 1;
+        else if (stat === "def") player.def += 1;
+        else if (stat === "spd") player.spd += 1;
+        else if (stat === "luck") player.luck += 1;
+        player.statPoints -= 1;
+        set({ player });
+      },
+
+      equipAbility: (itemId) => {
+        const def = ITEMS[itemId];
+        if (!def || def.type !== "ability") return false;
+        const player = { ...get().player };
+        if (!player.items.includes(itemId)) return false;
+        if (player.equippedAbilities.includes(itemId)) return false;
+        if (player.equippedAbilities.length >= 3) return false;
+        player.equippedAbilities = [...player.equippedAbilities, itemId];
+        set({ player });
+        return true;
+      },
+
+      unequipAbility: (itemId) => {
+        const player = { ...get().player };
+        player.equippedAbilities = player.equippedAbilities.filter((id) => id !== itemId);
+        set({ player });
       },
 
       recordAnswer: (correct) => {
@@ -290,19 +321,13 @@ export const useGame = create<GameState>()(
         set({ stats });
       },
 
-      setDifficulty: (d) => {
-        const player = { ...get().player, difficulty: d };
-        set({ player });
-      },
-
       recordStageLoss: (stageId) => {
         const player = { ...get().player };
         player.stageLosses = { ...player.stageLosses };
         player.stageLosses[stageId] = (player.stageLosses[stageId] || 0) + 1;
-        // Mercy: heal player 30% on 3rd loss to avoid frustration
         if (player.stageLosses[stageId] >= 3) {
           player.hp = Math.min(player.maxHp, player.hp + Math.floor(player.maxHp * 0.3));
-          player.stageLosses[stageId] = 0; // reset
+          player.stageLosses[stageId] = 0;
         }
         set({ player });
       },
@@ -315,8 +340,7 @@ export const useGame = create<GameState>()(
         soundEnabled: s.soundEnabled,
         crtEnabled: s.crtEnabled,
       }),
-      version: 3,
-      // Migrate from older versions
+      version: 4,
       migrate: (persisted: any, version: number) => {
         if (!persisted) return persisted;
         if (version < 2) {
@@ -330,10 +354,21 @@ export const useGame = create<GameState>()(
           }
         }
         if (version < 3) {
-          // v3: add difficulty & stageLosses
           if (persisted.player) {
             persisted.player.difficulty = persisted.player.difficulty ?? "normal";
             persisted.player.stageLosses = persisted.player.stageLosses ?? {};
+          }
+        }
+        if (version < 4) {
+          // v4: add stats, abilities, remove difficulty
+          if (persisted.player) {
+            persisted.player.statPoints = persisted.player.statPoints ?? 0;
+            persisted.player.atk = persisted.player.atk ?? 0;
+            persisted.player.def = persisted.player.def ?? 0;
+            persisted.player.spd = persisted.player.spd ?? 0;
+            persisted.player.luck = persisted.player.luck ?? 0;
+            persisted.player.equippedAbilities = persisted.player.equippedAbilities ?? [];
+            delete persisted.player.difficulty;
           }
         }
         return persisted;

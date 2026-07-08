@@ -62,48 +62,30 @@ export interface BattleEnemy {
   critChance?: number;
 }
 
-// ===== DIFFICULTY / SCALING =====
-export interface DifficultyConfig {
-  // Multipliers applied to enemy stats based on player level & stage
-  hpScale: number; // enemy HP = base * (1 + playerLevel * hpScale)
-  atkScale: number; // enemy ATK = base * (1 + playerLevel * atkScale)
+// ===== DIFFICULTY / SCALING (stage-based, no difficulty selector) =====
+// Enemy stats scale STEEPLY per stage to force player to upgrade their stats.
+export interface ScalingConfig {
+  // Per-stage HP/ATK growth multipliers
+  hpGrowth: number; // enemy HP multiplier per stage index
+  atkGrowth: number; // enemy ATK multiplier per stage index
   // Timer settings (seconds per question)
   baseTimer: number;
   fastBonus: number; // damage multiplier if answered in first 30% of timer
   slowPenalty: number; // damage multiplier if answered in last 30%
-  // Enemy crit settings
-  enemyCritChance: number;
-  enemyCritMult: number;
+  // Player crit (base + LUCK stat)
+  playerCritChance: number;
+  playerCritMult: number;
 }
 
-export const DIFFICULTY: Record<"easy" | "normal" | "hard", DifficultyConfig> = {
-  easy: {
-    hpScale: 0.05,
-    atkScale: 0.05,
-    baseTimer: 20,
-    fastBonus: 1.5,
-    slowPenalty: 0.7,
-    enemyCritChance: 0.05,
-    enemyCritMult: 1.5,
-  },
-  normal: {
-    hpScale: 0.1,
-    atkScale: 0.1,
-    baseTimer: 15,
-    fastBonus: 1.8,
-    slowPenalty: 0.5,
-    enemyCritChance: 0.1,
-    enemyCritMult: 2,
-  },
-  hard: {
-    hpScale: 0.15,
-    atkScale: 0.15,
-    baseTimer: 10,
-    fastBonus: 2,
-    slowPenalty: 0.3,
-    enemyCritChance: 0.2,
-    enemyCritMult: 2.5,
-  },
+export const SCALING: ScalingConfig = {
+  // Steeper growth: stage 1 = 1x, stage 5 = 1.8x, stage 10 = 2.6x, stage 20 = 4.2x
+  hpGrowth: 0.16, // +16% per stage
+  atkGrowth: 0.12, // +12% per stage
+  baseTimer: 15,
+  fastBonus: 1.8,
+  slowPenalty: 0.5,
+  playerCritChance: 0.1,
+  playerCritMult: 2,
 };
 
 export interface Stage {
@@ -148,15 +130,48 @@ export interface World {
 }
 
 // ===== ITEMS SYSTEM =====
+// Two types of items:
+// 1. Consumable - potions used in battle (heal, shield, etc.)
+// 2. Ability - equipable perks that give passive bonuses (Dicero-style)
+export type ItemType = "consumable" | "ability";
+export type ItemEffect =
+  | "heal"
+  | "fullheal"
+  | "hint"
+  | "shield"
+  | "revive"
+  | "damage";
+
+// === ABILITY PERK EFFECTS (passive, only active when equipped) ===
+export type AbilityPerk =
+  | "vampire" // heal 1 HP on correct answer
+  | "berserker" // +50% damage but -25% max HP
+  | "lucky_charm" // +15% crit chance
+  | "swift_boots" // +3s timer
+  | "iron_shield" // -1 damage taken from all sources
+  | "scholar" // hints always visible
+  | "thorns" // reflect 2 damage when hit
+  | "executioner" // +100% damage to enemies below 30% HP
+  | "time_freeze" // first 3 questions have +5s timer
+  | "combo_master" // combo damage bonus doubled
+  | "regen_player" // heal 1 HP every 3 turns
+  | "shield_start" // start battle with shield active
+  | "double_strike" // 20% chance to attack twice on correct answer
+  | "golden_touch" // +50% coins from battles
+  | "xp_boost"; // +25% XP from battles
+
 export interface ItemDef {
   id: string;
   name: string;
   icon: string;
   description: string;
-  effect: "heal" | "fullheal" | "hint" | "shield" | "revive" | "damage";
-  value: number; // amount of effect (HP restored, damage dealt, etc.)
-  price: number; // shop price
-  consumable: boolean;
+  type: ItemType;
+  // For consumable
+  effect?: ItemEffect;
+  value?: number; // amount of effect (HP restored, damage dealt, etc.)
+  // For ability
+  perk?: AbilityPerk;
+  price: number; // shop price (0 = not for sale, only from rewards)
 }
 
 // ===== ACHIEVEMENTS =====
@@ -177,14 +192,26 @@ export interface PlayerState {
   xpToNext: number;
   hp: number;
   maxHp: number;
-  coins: number; // currency for shop
+  coins: number;
   badges: string[];
-  items: string[]; // item IDs
-  itemCounts: Record<string, number>; // item id -> count
-  completedStages: string[]; // stage IDs
+  items: string[]; // item IDs (consumable + ability owned)
+  itemCounts: Record<string, number>; // item id -> count (for consumables)
+  completedStages: string[];
   unlockedWorlds: WorldId[];
-  achievements: string[]; // unlocked achievement IDs
-  difficulty: "easy" | "normal" | "hard";
+  achievements: string[];
+
+  // === PLAYER STATS (Dicero-style, upgradeable) ===
+  // Base stats that can be increased by allocating stat points on level up
+  statPoints: number; // unspent stat points
+  atk: number; // damage multiplier (each point = +10% damage)
+  def: number; // damage reduction (each point = -8% damage taken)
+  spd: number; // timer bonus (each point = +0.5s timer)
+  luck: number; // crit chance (each point = +3% crit chance)
+
+  // === EQUIPPED ABILITIES (Dicero-style perks) ===
+  // Max 3 equipped at once. Each gives passive effect in battle.
+  equippedAbilities: string[]; // item IDs of equipped ability items
+
   // Anti-frustration: track losses per stage for mercy mechanic
   stageLosses: Record<string, number>;
 }
@@ -214,4 +241,5 @@ export type GameView =
   | "shop"
   | "practice"
   | "achievements"
+  | "stats"
   | "settings";

@@ -6,9 +6,9 @@ import { getStage } from "@/lib/game/stages";
 import { getWorld } from "@/lib/game/worlds";
 import { ITEMS, getItem } from "@/lib/game/items";
 import { getEnemySprite, getHeroSprite } from "@/lib/game/sprites";
-import { scaleEnemy, processEnemyTurn, computePlayerDamage, ABILITY_INFO } from "@/lib/game/enemy-ai";
+import { scaleEnemy, processEnemyTurn, computePlayerDamage, computePlayerStatsEffect, processAbilitiesOnCorrect, hasPerk, ABILITY_INFO } from "@/lib/game/enemy-ai";
 import { getBattleQuestions } from "@/lib/game/question-randomizer";
-import { DIFFICULTY } from "@/lib/game/types";
+import { SCALING } from "@/lib/game/types";
 import { PixelButton, PixelPanel, PixelSprite, StatBar } from "./PixelUI";
 import { audio } from "@/lib/game/audio";
 import type { Question } from "@/lib/game/types";
@@ -78,16 +78,15 @@ export function BattleScreen() {
   const stage = selectedStageId ? getStage(selectedStageId) : null;
   const world = stage ? getWorld(stage.worldId) : null;
 
-  // Scale enemy based on player level & difficulty
+  // Scale enemy based on stage index (steeper growth per stage)
   const scaledEnemy = useMemo(() => {
     if (!stage || !stage.enemies[0]) return null;
     return scaleEnemy(
       stage.enemies[0],
       player.level,
       stage.index,
-      player.difficulty,
     );
-  }, [stage, player.level, player.difficulty]);
+  }, [stage, player.level]);
 
   // Get randomized questions for this battle (memoized per stage)
   const battleQuestions = useMemo(() => {
@@ -95,24 +94,45 @@ export function BattleScreen() {
     return getBattleQuestions(stage);
   }, [stage]);
 
-  const difficultyCfg = DIFFICULTY[player.difficulty];
-  const baseTimer = difficultyCfg.baseTimer - (scaledEnemy?.abilities?.includes("time-pressure") ? 5 : 0);
+  // Compute player stats effect (ATK/DEF/SPD/LUCK + equipped abilities)
+  const playerEffect = useMemo(() => {
+    return computePlayerStatsEffect({
+      atk: player.atk,
+      def: player.def,
+      spd: player.spd,
+      luck: player.luck,
+      maxHp: player.maxHp,
+      equippedAbilities: player.equippedAbilities,
+    });
+  }, [player.atk, player.def, player.spd, player.luck, player.maxHp, player.equippedAbilities]);
+
+  const baseTimer = SCALING.baseTimer
+    + playerEffect.timerBonus  // SPD stat
+    + (hasPerk(player.equippedAbilities, "swift_boots") ? 3 : 0)  // swift_boots ability
+    - (scaledEnemy?.abilities?.includes("time-pressure") ? 5 : 0);  // enemy time-pressure
+
+  // Time freeze ability: +5s for first 3 questions
+  const hasTimeFreeze = hasPerk(player.equippedAbilities, "time_freeze");
+  const hasScholar = hasPerk(player.equippedAbilities, "scholar");
+  const hasIronShield = hasPerk(player.equippedAbilities, "iron_shield");
+  const hasShieldStart = hasPerk(player.equippedAbilities, "shield_start");
+  const hasThorns = hasPerk(player.equippedAbilities, "thorns");
 
   const [state, setState] = useState<BattleState>({
     enemyHp: scaledEnemy?.scaledHp ?? 1,
     enemyMaxHp: scaledEnemy?.scaledHp ?? 1,
-    playerHp: player.hp,
+    playerHp: Math.min(player.hp, playerEffect.effectiveMaxHp),
     questionIdx: 0,
     totalCorrect: 0,
     combo: 0,
     bestCombo: 0,
     isCritical: false,
-    shieldActive: false,
+    shieldActive: hasShieldStart, // shield_start ability
     enemyShieldActive: false,
     poisonTurns: 0,
     enemyEnraged: false,
     turnNumber: 0,
-    timeRemaining: baseTimer,
+    timeRemaining: baseTimer + (hasTimeFreeze ? 5 : 0),
     timerActive: true,
     enemyShake: false,
     enemyFlashRed: false,
@@ -121,7 +141,9 @@ export function BattleScreen() {
     playerDamageText: null,
     comboText: null,
     enemyActionText: null,
-    statusMessage: "Pertarungan dimulai! Jawab dengan benar untuk menyerang!",
+    statusMessage: hasShieldStart
+      ? "🛡 Perisai awal aktif! Jawab dengan benar untuk menyerang!"
+      : "Pertarungan dimulai! Jawab dengan benar untuk menyerang!",
     lastAnswerCorrect: null,
     battleEnded: false,
     victory: false,
@@ -338,33 +360,38 @@ export function BattleScreen() {
       const numQuestions = battleQuestions.length;
       // Base damage = scaledEnemy.hp / totalQuestions so all-correct = death
       const baseDmg = Math.ceil(enemy.scaledHp / numQuestions);
-      // Combo system: every consecutive correct adds +1 damage
+      // Combo system: every consecutive correct adds combo
       const newCombo = isCorrect ? state.combo + 1 : 0;
 
-      // Critical hit: 15% chance, doubles damage
-      const isCrit = isCorrect && Math.random() < 0.15;
-
-      // Compute player damage with timing bonus
+      // Compute player damage with timing bonus + stats + abilities
       const timeRemaining = state.timeRemaining;
-      const { damage: dmgToEnemy, isFast, isSlow } = isCorrect
+      // Time freeze: +5s for first 3 questions
+      const effectiveMaxTime = baseTimer + (hasTimeFreeze && state.questionIdx < 3 ? 5 : 0);
+      const playerDamageResult = isCorrect
         ? computePlayerDamage(
             baseDmg,
-            newCombo - 1, // combo bonus applied inside
-            isCrit,
+            newCombo - 1,
             timeRemaining,
-            baseTimer,
-            player.difficulty,
+            effectiveMaxTime,
+            playerEffect,
+            state.enemyHp,
+            state.enemyMaxHp,
+            player.equippedAbilities,
           )
-        : { damage: 0, isFast: false, isSlow: false };
+        : { damage: 0, isFast: false, isSlow: false, isCrit: false, isDoubleStrike: false, timingMult: 1 };
+      const { damage: dmgToEnemyBase, isFast, isSlow, isCrit, isDoubleStrike } = playerDamageResult;
+      // Double strike: deal damage twice
+      const dmgToEnemy = isDoubleStrike ? dmgToEnemyBase * 2 : dmgToEnemyBase;
 
-      // Process enemy turn (abilities trigger)
+      // Process enemy turn (abilities trigger) - with player DEF reduction
       const enemyTurn = processEnemyTurn(
         enemy,
         state.enemyHp,
         state.enemyMaxHp,
         state.turnNumber + 1,
-        player.difficulty,
         !isCorrect,
+        playerEffect.damageReduction,
+        hasIronShield,
       );
 
       // Apply enemy heal
@@ -379,9 +406,6 @@ export function BattleScreen() {
       let dmgAfterEnemyHeal = Math.max(0, actualEnemyHp - dmgToEnemy);
       // Enemy shield blocks player's hit
       const enemyShieldBlocked = state.enemyShieldActive && isCorrect;
-      if (enemyShieldBlocked) {
-        // Player's attack blocked - reset enemy shield
-      }
 
       // Shield blocks enemy damage to player
       const shieldBlocked = state.shieldActive && !isCorrect;
@@ -394,18 +418,43 @@ export function BattleScreen() {
       const newPoisonTurns = enemyTurn.poisonApplied ? 2 : Math.max(0, state.poisonTurns - 1);
       // Poison ticks for 1 HP per turn
       const poisonDmg = newPoisonTurns > 0 ? 1 : 0;
+
+      // Thorns: reflect 2 damage when hit
+      const thornsDmg = hasThorns && dmgToPlayer > 0 ? 2 : 0;
+
       const totalPlayerDmg = dmgToPlayer + counterDmg + poisonDmg;
+
+      // === ABILITY EFFECTS ON CORRECT ANSWER ===
+      let abilityHeal = 0;
+      const abilityMessages: string[] = [];
+      if (isCorrect) {
+        const abilityResult = processAbilitiesOnCorrect(
+          state.turnNumber + 1,
+          baseDmg,
+          player.equippedAbilities,
+        );
+        if (abilityResult.vampireHeal) {
+          abilityHeal += abilityResult.vampireHeal;
+        }
+        if (abilityResult.regenHeal) {
+          abilityHeal += abilityResult.regenHeal;
+        }
+        abilityMessages.push(...abilityResult.messages);
+      }
 
       // Update stats tracking
       recordAnswer(isCorrect);
 
       const finalEnemyHp = enemyShieldBlocked ? actualEnemyHp : dmgAfterEnemyHeal;
+      // Apply thorns damage to enemy
+      const finalEnemyHpWithThorns = Math.max(0, finalEnemyHp - thornsDmg);
 
       // Build status messages
       let statusMsg = "";
       if (isCorrect) {
-        if (isCrit) statusMsg = `💥 CRITICAL HIT! ${newCombo}x combo!`;
-        else if (isFast) statusMsg = `⚡ FAST! ${newCombo}x combo! (+${Math.round((isCorrect ? 1.8 : 1) * 100 - 100)}% dmg)`;
+        if (isDoubleStrike) statusMsg = `👊 DOUBLE STRIKE! ${newCombo}x combo!`;
+        else if (isCrit) statusMsg = `💥 CRITICAL HIT! ${newCombo}x combo!`;
+        else if (isFast) statusMsg = `⚡ FAST! ${newCombo}x combo!`;
         else if (newCombo >= 2) statusMsg = `✓ Benar! Combo ${newCombo}x!`;
         else statusMsg = "✓ Benar! Serangan mengenai musuh!";
         if (enemyShieldBlocked) statusMsg = "🛡 Seranganmu diblokir perisai musuh!";
@@ -424,8 +473,8 @@ export function BattleScreen() {
         combo: newCombo,
         bestCombo: Math.max(s.bestCombo, newCombo),
         isCritical: isCrit,
-        enemyHp: finalEnemyHp,
-        playerHp: Math.max(0, s.playerHp - totalPlayerDmg),
+        enemyHp: finalEnemyHpWithThorns,
+        playerHp: Math.max(0, Math.min(playerEffect.effectiveMaxHp, s.playerHp - totalPlayerDmg + abilityHeal)),
         shieldActive: shieldBlocked ? false : s.shieldActive,
         enemyShieldActive: enemyTurn.shieldGained ? true : (enemyShieldBlocked ? false : s.enemyShieldActive),
         poisonTurns: newPoisonTurns,
@@ -438,7 +487,7 @@ export function BattleScreen() {
         enemyDamageText: null,
         playerDamageText: null,
         comboText: isCorrect && newCombo >= 2 ? `${newCombo}x COMBO!` : null,
-        enemyActionText: enemyTurn.messages.length > 0 ? enemyTurn.messages[0] : null,
+        enemyActionText: enemyTurn.messages.length > 0 ? enemyTurn.messages[0] : (abilityMessages.length > 0 ? abilityMessages[0] : null),
         statusMessage: statusMsg,
       }));
 
@@ -529,11 +578,17 @@ export function BattleScreen() {
       state.turnNumber,
       state.timeRemaining,
       state.lastAnswerCorrect,
+      state.questionIdx,
       currentEnemy,
       stage,
       battleQuestions,
       baseTimer,
-      player.difficulty,
+      playerEffect,
+      player.equippedAbilities,
+      hasIronShield,
+      hasThorns,
+      hasTimeFreeze,
+      hasScholar,
       damagePlayer,
       showFloatingDamage,
       recordAnswer,
@@ -843,18 +898,18 @@ export function BattleScreen() {
                     setState({
                       enemyHp: scaledEnemy?.scaledHp ?? 1,
                       enemyMaxHp: scaledEnemy?.scaledHp ?? 1,
-                      playerHp: player.hp,
+                      playerHp: Math.min(player.hp, playerEffect.effectiveMaxHp),
                       questionIdx: 0,
                       totalCorrect: 0,
                       combo: 0,
                       bestCombo: 0,
                       isCritical: false,
-                      shieldActive: false,
+                      shieldActive: hasShieldStart,
                       enemyShieldActive: false,
                       poisonTurns: 0,
                       enemyEnraged: false,
                       turnNumber: 0,
-                      timeRemaining: baseTimer,
+                      timeRemaining: baseTimer + (hasTimeFreeze ? 5 : 0),
                       timerActive: true,
                       enemyShake: false,
                       enemyFlashRed: false,
@@ -863,7 +918,9 @@ export function BattleScreen() {
                       playerDamageText: null,
                       comboText: null,
                       enemyActionText: null,
-                      statusMessage: "Coba lagi! Semangat!",
+                      statusMessage: hasShieldStart
+                        ? "🛡 Perisai awal aktif! Coba lagi!"
+                        : "Coba lagi! Semangat!",
                       lastAnswerCorrect: null,
                       battleEnded: false,
                       victory: false,
@@ -1204,7 +1261,7 @@ export function BattleScreen() {
           </div>
 
           {/* Player HP bar bottom-left */}
-          <div className="absolute bottom-3 left-3 right-24 md:right-auto md:w-72 z-10">
+          <div className="absolute bottom-3 left-3 right-24 md:right-auto md:w-80 z-10">
             <div
               className="p-2"
               style={{
@@ -1222,11 +1279,62 @@ export function BattleScreen() {
               </div>
               <StatBar
                 current={state.playerHp}
-                max={player.maxHp}
+                max={playerEffect.effectiveMaxHp}
                 color="var(--kq-hp)"
                 height={10}
                 showNumbers={false}
               />
+              {/* Player stats row */}
+              <div className="flex items-center gap-1 mt-1 flex-wrap">
+                <span
+                  className="font-pixel text-[0.4rem] px-1"
+                  style={{ background: "#ef5350", color: "white" }}
+                  title="ATK: +10% damage per point"
+                >
+                  ⚔{player.atk}
+                </span>
+                <span
+                  className="font-pixel text-[0.4rem] px-1"
+                  style={{ background: "#4fc3f7", color: "white" }}
+                  title="DEF: -8% damage taken per point"
+                >
+                  🛡{player.def}
+                </span>
+                <span
+                  className="font-pixel text-[0.4rem] px-1"
+                  style={{ background: "#66bb6a", color: "white" }}
+                  title="SPD: +0.5s timer per point"
+                >
+                  👟{player.spd}
+                </span>
+                <span
+                  className="font-pixel text-[0.4rem] px-1"
+                  style={{ background: "#ffd54f", color: "black" }}
+                  title="LUCK: +3% crit chance per point"
+                >
+                  🍀{player.luck}
+                </span>
+                {/* Equipped abilities */}
+                {player.equippedAbilities.length > 0 && (
+                  <span className="font-pixel text-[0.35rem] text-white/60 ml-1">
+                    PERK:
+                  </span>
+                )}
+                {player.equippedAbilities.map((id) => {
+                  const def = ITEMS[id];
+                  if (!def) return null;
+                  return (
+                    <span
+                      key={id}
+                      className="text-sm"
+                      title={def.name + ": " + def.description}
+                      style={{ filter: "drop-shadow(1px 1px 0 rgba(0,0,0,0.5))" }}
+                    >
+                      {def.icon}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -1554,6 +1662,7 @@ export function BattleScreen() {
           {/* Hint */}
           {currentQuestion.hint &&
             !showHint &&
+            !hasScholar &&
             state.lastAnswerCorrect === null && (
               <div className="text-center mt-4">
                 <button
@@ -1568,7 +1677,7 @@ export function BattleScreen() {
                 </button>
               </div>
             )}
-          {showHint && currentQuestion.hint && (
+          {(showHint || hasScholar) && currentQuestion.hint && (
             <div
               className="mt-3 p-2 text-center"
               style={{
@@ -1578,6 +1687,11 @@ export function BattleScreen() {
             >
               <p className="font-vt text-base text-black">
                 💡 {currentQuestion.hint}
+                {hasScholar && (
+                  <span className="font-pixel text-[0.4rem] ml-2 text-black/60">
+                    (🤓 SCHOLAR)
+                  </span>
+                )}
               </p>
             </div>
           )}

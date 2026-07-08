@@ -13,6 +13,7 @@ import { Codex } from "@/components/game/Codex";
 import { Shop } from "@/components/game/Shop";
 import { Practice } from "@/components/game/Practice";
 import { Achievements } from "@/components/game/Achievements";
+import { StatsScreen } from "@/components/game/StatsScreen";
 
 export default function Page() {
   const { view, soundEnabled, crtEnabled } = useGame();
@@ -57,6 +58,7 @@ export default function Page() {
         {view === "shop" && <Shop />}
         {view === "practice" && <Practice />}
         {view === "achievements" && <Achievements />}
+        {view === "stats" && <StatsScreen />}
       </main>
     </div>
   );

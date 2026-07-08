@@ -12,7 +12,6 @@ export function HUD() {
     toggleSound,
     toggleCrt,
     setView,
-    setDifficulty,
     view,
   } = useGame();
 
@@ -220,43 +219,37 @@ export function HUD() {
           >
             <span className="font-pixel text-[0.5rem]">📺</span>
           </button>
-          {/* Difficulty selector */}
-          <div
-            className="flex items-center"
-            style={{
-              background: "var(--kq-bg-3)",
-              border: "2px solid var(--kq-fg)",
+          {/* Stats & Abilities button - with badge for stat points */}
+          <button
+            onClick={() => {
+              audio.click();
+              setView("stats" as any);
             }}
+            className="p-2 hover:opacity-80 relative"
+            style={{
+              background:
+                view === "stats" ? "var(--kq-accent)" : "var(--kq-bg-3)",
+              border: "2px solid var(--kq-fg)",
+              color: view === "stats" ? "black" : "var(--kq-fg)",
+            }}
+            aria-label="Stats & Abilities"
+            title="Stats & Abilities"
           >
-            {(["easy", "normal", "hard"] as const).map((d) => (
-              <button
-                key={d}
-                onClick={() => {
-                  audio.click();
-                  setDifficulty(d);
-                }}
-                className="px-2 py-2"
+            <span className="font-pixel text-[0.5rem]">⚙</span>
+            {player.statPoints > 0 && (
+              <span
+                className="absolute -top-1 -right-1 font-pixel text-[0.4rem] px-1 py-0.5 kq-blink"
                 style={{
-                  background:
-                    player.difficulty === d
-                      ? d === "easy"
-                        ? "var(--kq-correct)"
-                        : d === "normal"
-                          ? "var(--kq-accent)"
-                          : "var(--kq-attack)"
-                      : "transparent",
-                  color:
-                    player.difficulty === d ? "black" : "var(--kq-fg)",
+                  background: "var(--kq-attack)",
+                  color: "white",
+                  border: "1px solid var(--kq-panel-border)",
+                  borderRadius: 0,
                 }}
-                aria-label={`Difficulty: ${d}`}
-                title={`Difficulty: ${d}`}
               >
-                <span className="font-pixel text-[0.45rem] uppercase">
-                  {d === "easy" ? "EZ" : d === "normal" ? "NM" : "HD"}
-                </span>
-              </button>
-            ))}
-          </div>
+                {player.statPoints}
+              </span>
+            )}
+          </button>
         </div>
       </div>
     </header>
