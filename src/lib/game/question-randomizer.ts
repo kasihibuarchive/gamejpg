@@ -75,17 +75,19 @@ export function randomizeStageQuestions(stage: Stage, count?: number): Question[
  * Generate extra variations of a question by creating "reverse" questions.
  * E.g., "Huruf apa ini? あ" → "Pilih huruf 'a':" with あ as one option.
  * This expands the pool without manual authoring.
+ * Now generates MORE variations for better battle length.
  */
 export function expandQuestionPool(stage: Stage): Question[] {
   const extra: Question[] = [];
 
   if (!stage.lesson) return stage.questions;
+  const rows = stage.lesson.rows;
 
-  // For each lesson row, generate a "reverse" question
-  for (const row of stage.lesson.rows) {
-    // 50% chance: add a "find the kana for this romaji" question
-    if (Math.random() < 0.5 && stage.lesson.rows.length >= 4) {
-      const others = stage.lesson.rows.filter((r) => r.kana !== row.kana);
+  // For each lesson row, generate ALL possible variations (not random)
+  for (const row of rows) {
+    // Always add: "find the kana for this romaji" (if 4+ rows for distractors)
+    if (rows.length >= 4) {
+      const others = rows.filter((r) => r.kana !== row.kana);
       const distractors = shuffle(others).slice(0, 3).map((r) => r.kana);
       const options = shuffle([row.kana, ...distractors]);
       extra.push({
@@ -97,9 +99,9 @@ export function expandQuestionPool(stage: Stage): Question[] {
       });
     }
 
-    // 30% chance: add a "meaning" question if meaning exists
-    if (Math.random() < 0.3 && row.meaning) {
-      const others = stage.lesson.rows.filter((r) => r.meaning && r.kana !== row.kana);
+    // Always add: "meaning" question if meaning exists
+    if (row.meaning) {
+      const others = rows.filter((r) => r.meaning && r.kana !== row.kana);
       if (others.length >= 3) {
         const distractors = shuffle(others).slice(0, 3).map((r) => r.meaning!);
         const options = shuffle([row.meaning!, ...distractors]);
@@ -112,9 +114,35 @@ export function expandQuestionPool(stage: Stage): Question[] {
         });
       }
     }
+
+    // Always add: "find the romaji for this kana" (reverse typing)
+    if (row.romaji) {
+      extra.push({
+        type: "typing",
+        prompt: `Ketik romaji untuk huruf ini:`,
+        kana: row.kana,
+        answer: [row.romaji],
+        hint: row.meaning,
+      });
+    }
+
+    // Add: "which kana matches this meaning" question
+    if (row.meaning && rows.length >= 4) {
+      const others = rows.filter((r) => r.meaning && r.kana !== row.kana);
+      if (others.length >= 3) {
+        const distractors = shuffle(others).slice(0, 3).map((r) => r.kana);
+        const options = shuffle([row.kana, ...distractors]);
+        extra.push({
+          type: "choice",
+          prompt: `Huruf mana yang berarti "${row.meaning}"?`,
+          options,
+          answer: options.indexOf(row.kana),
+        });
+      }
+    }
   }
 
-  // Combine original + extra, dedup by prompt
+  // Combine original + extra, dedup by prompt+kana
   const seen = new Set<string>();
   const combined = [...stage.questions, ...extra].filter((q) => {
     const key = q.prompt + (q.type === "choice" || q.type === "typing" ? q.kana ?? "" : "");
@@ -128,12 +156,19 @@ export function expandQuestionPool(stage: Stage): Question[] {
 
 /**
  * Get a randomized, expanded question set for a stage.
- * This is the main entry point used by BattleScreen.
+ * Now scales question count based on stage type:
+ * - Regular: 8 questions
+ * - Mini-boss: 10 questions
+ * - Boss: 12 questions
  */
 export function getBattleQuestions(stage: Stage): Question[] {
   const expanded = expandQuestionPool(stage);
-  // Use expanded pool, take same count as original
-  const count = stage.questions.length;
+  // Scale question count by stage type
+  let count = 8; // default
+  if (stage.type === "mini-boss") count = 10;
+  if (stage.type === "boss") count = 12;
+  count = Math.min(count, expanded.length); // can't exceed pool
+  count = Math.max(count, stage.questions.length); // at least original count
   const fakeStage = { ...stage, questions: expanded };
   return randomizeStageQuestions(fakeStage, count);
 }

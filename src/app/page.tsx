@@ -14,6 +14,7 @@ import { Shop } from "@/components/game/Shop";
 import { Practice } from "@/components/game/Practice";
 import { Achievements } from "@/components/game/Achievements";
 import { StatsScreen } from "@/components/game/StatsScreen";
+import { HeroScreen } from "@/components/game/HeroScreen";
 
 export default function Page() {
   const { view, soundEnabled, crtEnabled } = useGame();
@@ -59,6 +60,7 @@ export default function Page() {
         {view === "practice" && <Practice />}
         {view === "achievements" && <Achievements />}
         {view === "stats" && <StatsScreen />}
+        {view === "hero" && <HeroScreen />}
       </main>
     </div>
   );

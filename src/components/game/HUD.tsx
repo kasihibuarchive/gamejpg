@@ -114,6 +114,36 @@ export function HUD() {
 
         {/* Quick actions - shop, achievements, practice, codex */}
         <div className="flex items-center gap-1 shrink-0">
+          {/* Hero button - dedicated character sheet */}
+          <button
+            onClick={() => {
+              audio.click();
+              setView("hero" as any);
+            }}
+            className="p-2 hover:opacity-80 relative"
+            style={{
+              background:
+                view === "hero" ? "var(--kq-accent)" : "var(--kq-n3)",
+              border: "2px solid var(--kq-fg)",
+              color: view === "hero" ? "black" : "white",
+            }}
+            aria-label="Hero - Character Sheet"
+            title="Hero - Character Sheet"
+          >
+            <span className="font-pixel text-[0.5rem]">🧙</span>
+            {player.statPoints > 0 && (
+              <span
+                className="absolute -top-1 -right-1 font-pixel text-[0.4rem] px-1 py-0.5 kq-blink"
+                style={{
+                  background: "var(--kq-attack)",
+                  color: "white",
+                  border: "1px solid var(--kq-panel-border)",
+                }}
+              >
+                {player.statPoints}
+              </span>
+            )}
+          </button>
           <button
             onClick={() => {
               audio.click();

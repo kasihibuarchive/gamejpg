@@ -242,4 +242,5 @@ export type GameView =
   | "practice"
   | "achievements"
   | "stats"
+  | "hero"
   | "settings";
