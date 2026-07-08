@@ -1,0 +1,228 @@
+{
+  "sprites": {
+    "hero": {
+      "file": "hero.png",
+      "path": "/sprites/hero.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "yuki": {
+      "file": "yuki.png",
+      "path": "/sprites/yuki.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "slime": {
+      "file": "slime.png",
+      "path": "/sprites/slime.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "kappa": {
+      "file": "kappa.png",
+      "path": "/sprites/kappa.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "spirit": {
+      "file": "spirit.png",
+      "path": "/sprites/spirit.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "troll": {
+      "file": "troll.png",
+      "path": "/sprites/troll.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "gardo": {
+      "file": "gardo.png",
+      "path": "/sprites/gardo.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "shadow_king": {
+      "file": "shadow_king.png",
+      "path": "/sprites/shadow_king.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "mirror_phantom": {
+      "file": "mirror_phantom.png",
+      "path": "/sprites/mirror_phantom.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "book_spirit": {
+      "file": "book_spirit.png",
+      "path": "/sprites/book_spirit.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "kitsune": {
+      "file": "kitsune.png",
+      "path": "/sprites/kitsune.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "rokku": {
+      "file": "rokku.png",
+      "path": "/sprites/rokku.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "kanji_book": {
+      "file": "kanji_book.png",
+      "path": "/sprites/kanji_book.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "lord_vassal": {
+      "file": "lord_vassal.png",
+      "path": "/sprites/lord_vassal.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "k_beast": {
+      "file": "k_beast.png",
+      "path": "/sprites/k_beast.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "stone_trio": {
+      "file": "stone_trio.png",
+      "path": "/sprites/stone_trio.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "mirror_horde": {
+      "file": "mirror_horde.png",
+      "path": "/sprites/mirror_horde.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "word_phantom": {
+      "file": "word_phantom.png",
+      "path": "/sprites/word_phantom.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "mirror_test": {
+      "file": "mirror_test.png",
+      "path": "/sprites/mirror_test.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "number_ghost": {
+      "file": "number_ghost.png",
+      "path": "/sprites/number_ghost.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "is_bug": {
+      "file": "is_bug.png",
+      "path": "/sprites/is_bug.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "name_thief": {
+      "file": "name_thief.png",
+      "path": "/sprites/name_thief.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "confused_merchant": {
+      "file": "confused_merchant.png",
+      "path": "/sprites/confused_merchant.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "verb_shadow": {
+      "file": "verb_shadow.png",
+      "path": "/sprites/verb_shadow.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "adjective_mist": {
+      "file": "adjective_mist.png",
+      "path": "/sprites/adjective_mist.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "tokkun": {
+      "file": "tokkun.png",
+      "path": "/sprites/tokkun.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "kanji_tutor": {
+      "file": "kanji_tutor.png",
+      "path": "/sprites/kanji_tutor.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "echo_mirror": {
+      "file": "echo_mirror.png",
+      "path": "/sprites/echo_mirror.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "locked_door": {
+      "file": "locked_door.png",
+      "path": "/sprites/locked_door.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "merchant_illusion": {
+      "file": "merchant_illusion.png",
+      "path": "/sprites/merchant_illusion.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "shadow_nh": {
+      "file": "shadow_nh.png",
+      "path": "/sprites/shadow_nh.png",
+      "size": 32,
+      "scaled": 256
+    },
+    "kanji_book_2": {
+      "file": "kanji_book_2.png",
+      "path": "/sprites/kanji_book_2.png",
+      "size": 32,
+      "scaled": 256
+    }
+  },
+  "enemyMap": {
+    "slime-a": "slime",
+    "kappa-slime": "kappa",
+    "s-spirit": "spirit",
+    "t-troll": "troll",
+    "gardo": "gardo",
+    "shadow-king": "shadow_king",
+    "mirror-echo": "echo_mirror",
+    "k-beast": "k_beast",
+    "shadow-nh": "shadow_nh",
+    "three-siblings": "stone_trio",
+    "mirror-test": "mirror_test",
+    "locked-door": "locked_door",
+    "stone-trio": "stone_trio",
+    "mirror-horde": "mirror_horde",
+    "word-phantom": "word_phantom",
+    "mirror-phantom": "mirror_phantom",
+    "merchant-illusion": "merchant_illusion",
+    "book-spirit": "book_spirit",
+    "kitsune-bi": "kitsune",
+    "rokku": "rokku",
+    "confused-merchant": "confused_merchant",
+    "name-thief": "name_thief",
+    "is-bug": "is_bug",
+    "number-ghost": "number_ghost",
+    "tokkun": "tokkun",
+    "kanji-tutor": "kanji_tutor",
+    "kanji-book": "kanji_book",
+    "verb-shadow": "verb_shadow",
+    "adjective-mist": "adjective_mist",
+    "lord-vassal": "lord_vassal"
+  }
+}

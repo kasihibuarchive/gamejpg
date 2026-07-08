@@ -97,7 +97,13 @@ src/
     ├── n5-stages.ts        # Bab 3: N5 Vassal Kingdom (10 stage)
     ├── items.ts            # Item definitions + achievements
     ├── store.ts            # Zustand store dengan persist
-    └── audio.ts            # Chiptune AudioEngine
+    ├── audio.ts            # Chiptune AudioEngine
+    └── sprites.ts          # Enemy sprite mapping
+
+```
+public/sprites/             # 32 PNG sprite 8-bit (256x256)
+scripts/
+└── generate_sprites.py     # Pixel art sprite generator (PIL)
 ```
 
 ## 🎨 Desain Visual
@@ -106,6 +112,11 @@ src/
 - **Font pixel**: Press Start 2P untuk heading/UI, DotGothic16 untuk kanji, VT323 untuk body text
 - **Pixel borders**: thick bordered panels dengan box-shadow berlapis (classic game window look)
 - **CRT scanline overlay**: efek TV old-school (toggleable)
+- **Sprite pixel art asli**: 32 sprite 8-bit (32x32px, scaled 8x to 256x256) dibuat procedurally dengan PIL
+  - Hero (mage biru dengan tongkat sihir)
+  - Yuki (pemandu berjubah putih)
+  - 30 musuh unik: Slime, Kappa, Spirit, Troll, Gardo, Shadow King, Phantom Cermin, Kitsune-bi, Rokku, Lord Vassal, dll
+  - Lokasi: `/public/sprites/` — generator: `python3 scripts/generate_sprites.py`
 - **Animasi**: typewriter, float, bob, shake, pop, slash, damage-float, rainbow, combo
 
 ## 📖 Konsep Asli

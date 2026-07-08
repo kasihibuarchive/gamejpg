@@ -5,6 +5,7 @@ import { useGame } from "@/lib/game/store";
 import { getStage } from "@/lib/game/stages";
 import { getWorld } from "@/lib/game/worlds";
 import { ITEMS, getItem } from "@/lib/game/items";
+import { getEnemySprite, getHeroSprite } from "@/lib/game/sprites";
 import { PixelButton, PixelPanel, PixelSprite, StatBar } from "./PixelUI";
 import { audio } from "@/lib/game/audio";
 import type { Question } from "@/lib/game/types";
@@ -849,8 +850,9 @@ export function BattleScreen() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <div className="relative">
               <PixelSprite
+                src={getEnemySprite(currentEnemy.id) || undefined}
                 char={currentEnemy.sprite}
-                size={110}
+                size={120}
                 color={currentEnemy.color}
                 float={!state.enemyShake}
                 shake={state.enemyShake}
@@ -895,8 +897,9 @@ export function BattleScreen() {
           <div className="absolute bottom-3 right-3 md:right-8">
             <div className="relative">
               <PixelSprite
+                src={getHeroSprite(state.shieldActive)}
                 char={state.shieldActive ? "🧙‍♂️" : "🧙"}
-                size={75}
+                size={90}
                 float={!state.playerShake}
                 shake={state.playerShake}
               />

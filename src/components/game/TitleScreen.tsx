@@ -126,10 +126,18 @@ export function TitleScreen() {
         >
           {/* Hero sprite */}
           <div
-            className="text-5xl md:text-7xl kq-bob"
+            className="kq-bob"
             style={{ animationDelay: "0s" }}
           >
-            🧙
+            <img
+              src="/sprites/hero.png"
+              alt="Hero"
+              width={96}
+              height={96}
+              className="md:!w-[140px] md:!h-[140px]"
+              style={{ imageRendering: "pixelated", width: 96, height: 96 }}
+              draggable={false}
+            />
           </div>
           {/* VS */}
           <div
@@ -140,10 +148,18 @@ export function TitleScreen() {
           </div>
           {/* Enemy */}
           <div
-            className="text-5xl md:text-7xl kq-bob"
+            className="kq-bob"
             style={{ animationDelay: "0.7s" }}
           >
-            👑
+            <img
+              src="/sprites/shadow_king.png"
+              alt="Shadow King"
+              width={96}
+              height={96}
+              className="md:!w-[140px] md:!h-[140px]"
+              style={{ imageRendering: "pixelated", width: 96, height: 96 }}
+              draggable={false}
+            />
           </div>
         </div>
         {/* Ground shadow */}

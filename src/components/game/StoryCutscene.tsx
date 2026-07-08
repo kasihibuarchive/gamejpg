@@ -5,6 +5,7 @@ import { useGame } from "@/lib/game/store";
 import { getStage } from "@/lib/game/stages";
 import { getWorld } from "@/lib/game/worlds";
 import { PixelButton, PixelPanel, PixelSprite } from "./PixelUI";
+import { getEnemySprite, getHeroSprite } from "@/lib/game/sprites";
 import { audio } from "@/lib/game/audio";
 
 /** Parse markdown-like inline bold (**text**) */
@@ -230,7 +231,7 @@ export function StoryCutscene() {
                       border: "2px solid var(--kq-fg)",
                     }}
                   >
-                    <PixelSprite char={e.sprite} size={32} color={e.color} />
+                    <PixelSprite src={getEnemySprite(e.id) || undefined} char={e.sprite} size={40} color={e.color} />
                     <div>
                       <div className="font-pixel text-[0.55rem] text-white">
                         {e.name}
@@ -344,10 +345,10 @@ export function StoryCutscene() {
             </div>
             {/* Hero sprite always present */}
             <div
-              className="absolute bottom-2 left-4 text-4xl kq-bob"
+              className="absolute bottom-2 left-4 kq-bob"
               style={{ filter: "drop-shadow(2px 2px 0 rgba(0,0,0,0.4))" }}
             >
-              🧙
+              <PixelSprite src={getHeroSprite()} char="🧙" size={48} />
             </div>
           </div>
         </div>

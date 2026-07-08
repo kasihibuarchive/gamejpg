@@ -5,6 +5,7 @@ import { useGame } from "@/lib/game/store";
 import { getStagesByWorld } from "@/lib/game/stages";
 import { getWorld } from "@/lib/game/worlds";
 import { PixelButton, PixelPanel } from "./PixelUI";
+import { getEnemySprite } from "@/lib/game/sprites";
 import { audio } from "@/lib/game/audio";
 
 const STAGE_TYPE_META = {
@@ -245,18 +246,35 @@ export function StageSelect() {
                                 <span className="font-pixel text-[0.4rem] text-black/60">
                                   MUSUH:
                                 </span>
-                                {stage.enemies.map((e) => (
-                                  <span
-                                    key={e.id}
-                                    className="text-lg"
-                                    style={{
-                                      filter: "drop-shadow(1px 1px 0 rgba(0,0,0,0.3))",
-                                    }}
-                                    title={e.name}
-                                  >
-                                    {e.sprite}
-                                  </span>
-                                ))}
+                                {stage.enemies.map((e) => {
+                                  const spriteSrc = getEnemySprite(e.id);
+                                  return spriteSrc ? (
+                                    <img
+                                      key={e.id}
+                                      src={spriteSrc}
+                                      alt={e.name}
+                                      width={28}
+                                      height={28}
+                                      style={{
+                                        imageRendering: "pixelated",
+                                        filter: "drop-shadow(1px 1px 0 rgba(0,0,0,0.4))",
+                                      }}
+                                      title={e.name}
+                                      draggable={false}
+                                    />
+                                  ) : (
+                                    <span
+                                      key={e.id}
+                                      className="text-lg"
+                                      style={{
+                                        filter: "drop-shadow(1px 1px 0 rgba(0,0,0,0.3))",
+                                      }}
+                                      title={e.name}
+                                    >
+                                      {e.sprite}
+                                    </span>
+                                  );
+                                })}
                               </div>
                             )}
                           </div>

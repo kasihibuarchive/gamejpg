@@ -1,11 +1,12 @@
 "use client";
 
 /**
- * Pixel sprite - renders a single big emoji or text char as a chunky pixel sprite.
+ * Pixel sprite - renders a PNG image sprite OR emoji fallback as a chunky pixel sprite.
  * Uses CSS pixelated rendering + drop shadow for that 8-bit game look.
  */
 export function PixelSprite({
   char,
+  src,
   size = 80,
   color,
   className = "",
@@ -14,7 +15,8 @@ export function PixelSprite({
   flashRed = false,
   pop = false,
 }: {
-  char: string;
+  char?: string;
+  src?: string; // optional image URL (e.g. "/sprites/hero.png") - takes precedence over char
   size?: number;
   color?: string;
   className?: string;
@@ -24,7 +26,6 @@ export function PixelSprite({
   pop?: boolean;
 }) {
   // Compute animation class directly from props - no state needed.
-  // CSS animations restart automatically when the class is re-applied after being removed.
   const animClass = shake
     ? "kq-shake"
     : flashRed
@@ -33,9 +34,41 @@ export function PixelSprite({
         ? "kq-pop"
         : "";
 
+  const key = `${src || char}-${shake}-${flashRed}-${pop}`;
+
+  // If src is provided, render as <img> with pixelated rendering
+  if (src) {
+    return (
+      <div
+        key={key}
+        className={`relative inline-flex items-center justify-center ${float ? "kq-float" : ""} ${animClass} ${className}`}
+        style={{
+          width: size,
+          height: size,
+          filter: "drop-shadow(3px 3px 0 rgba(0,0,0,0.5))",
+        }}
+      >
+        <img
+          src={src}
+          alt={char || "sprite"}
+          width={size}
+          height={size}
+          style={{
+            width: size,
+            height: size,
+            imageRendering: "pixelated",
+            display: "block",
+          }}
+          draggable={false}
+        />
+      </div>
+    );
+  }
+
+  // Fallback: emoji/text rendering
   return (
     <div
-      key={`${char}-${shake}-${flashRed}-${pop}`}
+      key={key}
       className={`relative inline-flex items-center justify-center ${float ? "kq-float" : ""} ${animClass} ${className}`}
       style={{
         width: size,
