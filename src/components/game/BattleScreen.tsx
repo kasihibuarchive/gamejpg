@@ -1464,7 +1464,7 @@ export function BattleScreen() {
             </p>
             {currentQuestion.kana && (
               <div
-                className="font-gothic text-6xl md:text-7xl my-3 kq-pop"
+                className="jp-text text-6xl md:text-7xl my-3 kq-pop"
                 style={{ color: "var(--kq-panel-border)" }}
               >
                 {currentQuestion.kana}
@@ -1504,7 +1504,7 @@ export function BattleScreen() {
                             ? "var(--kq-panel)"
                             : "var(--kq-panel-border)",
                         textTransform: "none",
-                        fontFamily: "var(--font-gothic), var(--font-noto-jp), \"Noto Sans JP\", \"IPAGothic\", \"Noto Sans SC\", sans-serif",
+                        fontFamily: "\"DotGothic16\", \"IPAGothic\", \"Noto Sans JP\", \"Noto Sans SC\", sans-serif",
                         fontSize: "1rem",
                       }}
                     >
@@ -1603,7 +1603,7 @@ export function BattleScreen() {
                         disabled={
                           isMatched || state.lastAnswerCorrect !== null
                         }
-                        className="w-full py-3 px-2 font-gothic text-3xl transition-transform"
+                        className="w-full py-3 px-2 jp-text text-3xl transition-transform"
                         style={{
                           background: isMatched
                             ? "var(--kq-correct)"

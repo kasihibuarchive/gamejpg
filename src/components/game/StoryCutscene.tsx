@@ -172,7 +172,7 @@ export function StoryCutscene() {
                   }}
                 >
                   <div
-                    className="font-gothic text-4xl md:text-5xl mb-2"
+                    className="jp-text text-4xl md:text-5xl mb-2"
                     style={{ color: "var(--kq-panel-border)" }}
                   >
                     {row.kana}

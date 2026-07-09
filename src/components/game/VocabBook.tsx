@@ -178,7 +178,7 @@ export function VocabBook() {
                       >
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <div
-                            className="font-gothic text-2xl"
+                            className="jp-text text-2xl"
                             style={{ color: "var(--kq-panel-border)" }}
                           >
                             {v.kana}

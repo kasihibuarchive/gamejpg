@@ -227,7 +227,7 @@ export function Codex() {
                   title={k.meaning}
                 >
                   <div
-                    className="font-gothic text-2xl md:text-3xl"
+                    className="jp-text text-2xl md:text-3xl"
                     style={{ color: "var(--kq-panel-border)" }}
                   >
                     {k.kana}

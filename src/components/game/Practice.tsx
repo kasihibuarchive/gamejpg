@@ -425,7 +425,7 @@ export function Practice() {
             </p>
             {currentQuestion.kana && (
               <div
-                className="font-gothic text-6xl my-3 kq-pop"
+                className="jp-text text-6xl my-3 kq-pop"
                 style={{ color: "var(--kq-panel-border)" }}
               >
                 {currentQuestion.kana}
@@ -456,7 +456,7 @@ export function Practice() {
                           ? "var(--kq-correct)"
                           : "var(--kq-panel)",
                       color: "var(--kq-panel-border)",
-                      fontFamily: "var(--font-gothic), var(--font-noto-jp), \"Noto Sans JP\", \"IPAGothic\", \"Noto Sans SC\", sans-serif",
+                      fontFamily: "\"DotGothic16\", \"IPAGothic\", \"Noto Sans JP\", \"Noto Sans SC\", sans-serif",
                       fontSize: "1rem",
                     }}
                   >
@@ -518,7 +518,7 @@ export function Practice() {
             <div className="text-center font-vt text-base text-black/70 p-4">
               Matching questions are shown as the first pair to identify. (For
               full matching, play the original stage!)
-              <div className="mt-4 font-gothic text-4xl">
+              <div className="mt-4 jp-text text-4xl">
                 {currentQuestion.pairs[0].left}
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 max-w-xs mx-auto">

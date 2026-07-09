@@ -418,7 +418,7 @@ export function EndlessMode() {
               {currentQuestion.prompt}
             </p>
             {currentQuestion.kana && (
-              <div className="font-gothic text-6xl my-3 kq-pop" style={{ color: "var(--kq-panel-border)" }}>
+              <div className="jp-text text-6xl my-3 kq-pop" style={{ color: "var(--kq-panel-border)" }}>
                 {currentQuestion.kana}
               </div>
             )}
@@ -471,7 +471,7 @@ export function EndlessMode() {
                           ? "var(--kq-attack)"
                           : "var(--kq-panel)",
                       color: "var(--kq-panel-border)",
-                      fontFamily: currentQuestion.type === "kana" ? "var(--font-gothic), var(--font-noto-jp), \"Noto Sans JP\", sans-serif" : "var(--font-vt), var(--font-noto-jp), \"Noto Sans JP\", monospace",
+                      fontFamily: currentQuestion.type === "kana" ? "\"DotGothic16\", \"IPAGothic\", \"Noto Sans JP\", \"Noto Sans SC\", sans-serif" : "\"VT323\", \"IPAGothic\", \"Noto Sans JP\", monospace",
                       fontSize: currentQuestion.type === "kana" ? "1.5rem" : "1rem",
                     }}
                   >

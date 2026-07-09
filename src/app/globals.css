@@ -18,26 +18,32 @@
 /* ===== FONT FALLBACK CHAIN ===== */
 /* Critical: Japanese characters MUST fall back to CJK-capable fonts.
    Press Start 2P and VT323 don't support CJK glyphs → show boxes/mojibake.
-   Fallback order: Google Font → system CJK fonts → generic sans-serif */
+   Use !important to override Tailwind utilities. */
+
+/* Dedicated class for Japanese text - ALWAYS uses CJK font first */
+.jp-text {
+  font-family: "DotGothic16", var(--font-gothic), var(--font-noto-jp), "Noto Sans JP", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", sans-serif !important;
+}
 
 /* Pixel font (Press Start 2P) - no CJK support, MUST fall back */
 .font-pixel {
-  font-family: var(--font-pixel), var(--font-noto-jp), "Noto Sans JP", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", sans-serif;
+  font-family: var(--font-pixel), "Press Start 2P", var(--font-noto-jp), "Noto Sans JP", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", sans-serif !important;
+  letter-spacing: 0.05em;
 }
 
 /* Gothic font (DotGothic16) - supports CJK, but add fallback just in case */
 .font-gothic {
-  font-family: var(--font-gothic), var(--font-noto-jp), "Noto Sans JP", "DotGothic16", "IPAGothic", "Noto Sans SC", "LXGW WenKai", sans-serif;
+  font-family: var(--font-gothic), "DotGothic16", var(--font-noto-jp), "Noto Sans JP", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", sans-serif !important;
 }
 
 /* VT323 font - no CJK support, MUST fall back */
 .font-vt {
-  font-family: var(--font-vt), var(--font-noto-jp), "Noto Sans JP", "DotGothic16", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", monospace;
+  font-family: var(--font-vt), "VT323", var(--font-noto-jp), "Noto Sans JP", "DotGothic16", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", monospace !important;
 }
 
 /* Body default - always include CJK fallback */
 html, body {
-  font-family: var(--font-gothic), var(--font-noto-jp), "Noto Sans JP", "DotGothic16", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", system-ui, sans-serif;
+  font-family: var(--font-gothic), "DotGothic16", var(--font-noto-jp), "Noto Sans JP", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", system-ui, sans-serif !important;
 }
 
 /* ===== KOTOBAQUEST 8-BIT RPG PALETTE ===== */
