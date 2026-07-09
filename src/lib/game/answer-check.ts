@@ -1,20 +1,16 @@
 // ===== ANSWER VALIDATION HELPER =====
-// Centralized typing answer check with tolerance:
-// - Case insensitive
-// - Trim whitespace
-// - Normalize macrons (ā→a, ū→u, etc.)
-// - Split answers on "/" (e.g. "kyuu/ku" → ["kyuu", "ku"])
-// - Remove spaces and hyphens
-// - Handle common romaji variations (ou→o, uu→u for some cases)
+// Centralized typing answer check with STRONG tolerance.
+// Accepts many romaji variations: kohi, koohii, ko-hi, koohi, etc.
 
 /**
  * Normalize a single answer string for comparison.
+ * Very lenient: removes long vowels, hyphens, spaces, normalizes case.
  */
 function normalizeAnswer(s: string): string {
   return s
     .trim()
     .toLowerCase()
-    // Normalize macrons and long vowels
+    // Normalize macrons
     .replace(/ā/g, "a")
     .replace(/ī/g, "i")
     .replace(/ū/g, "u")
@@ -22,23 +18,20 @@ function normalizeAnswer(s: string): string {
     .replace(/ō/g, "o")
     // Remove spaces, hyphens, apostrophes
     .replace(/[\s\-']/g, "")
-    // Normalize "ou" → "o" (e.g. "arigatou" matches "arigato")
+    // Normalize long vowels: ou→o, oo→o, uu→u, ee→e, ii→i
+    // This means "koohii" → "kohi", "kyuu" → "kyu", "arigatou" → "arigato"
     .replace(/ou/g, "o")
-    // Normalize "oo" → "o" (e.g. "ohayoo" matches "ohayo")
     .replace(/oo/g, "o")
-    // Normalize "uu" → "u" (e.g. "kyuu" matches "kyu")
     .replace(/uu/g, "u")
-    // Normalize "ee" → "e" (e.g. "sensei" matches "sensee")
-    .replace(/ee/g, "e");
+    .replace(/ee/g, "e")
+    .replace(/ii/g, "i")
+    // Also handle remaining double letters after above (e.g. "kohhi" → "kohi")
+    .replace(/(.)\1+/g, "$1");
 }
 
 /**
  * Check if user's typed answer matches any of the acceptable answers.
- * Handles:
- * - Multiple acceptable answers in the `answer` array
- * - Answers containing "/" (split into multiple acceptable forms)
- * - User input containing "/" (also split, accept any part)
- * - Macrons, long vowels, spaces, hyphens
+ * VERY tolerant: accepts many romaji spelling variations.
  *
  * @param typedAnswer - What the user typed
  * @param acceptableAnswers - Array of acceptable answers (from question.answer)
@@ -70,7 +63,7 @@ export function checkTypingAnswer(
 
 /**
  * Get the primary (first) acceptable answer for display.
- * Splits on "/" and returns the first part.
+ * Cleans up: takes first variant, removes "/" splits.
  */
 export function getPrimaryAnswer(acceptableAnswers: string[]): string {
   if (acceptableAnswers.length === 0) return "";

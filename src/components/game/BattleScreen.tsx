@@ -1462,7 +1462,18 @@ export function BattleScreen() {
             >
               {currentQuestion.prompt}
             </p>
+            {/* Show big kana ONLY when it's the QUESTION (not the answer).
+                - Typing questions: kana is the question (type its romaji)
+                - Choice questions: only show if prompt asks "what does this mean?"
+                - NEVER show for "Pilih huruf untuk..." or "Lengkapi..." (kana is the answer!) */}
             {currentQuestion.kana && (
+              (currentQuestion.type === "typing") ||
+              (currentQuestion.type === "choice" &&
+               (currentQuestion.prompt.includes("arti") ||
+                currentQuestion.prompt.includes("いみ") ||
+                currentQuestion.prompt.includes("よみ") ||
+                currentQuestion.prompt.includes("bacaan")))
+            ) && (
               <div
                 className="jp-text text-6xl md:text-7xl my-3 kq-pop"
                 style={{ color: "var(--kq-panel-border)" }}

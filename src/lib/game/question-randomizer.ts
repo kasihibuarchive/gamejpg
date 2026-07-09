@@ -1,12 +1,10 @@
 // ===== QUESTION RANDOMIZER =====
 // Shuffles question order and choice options each battle.
 // Smart distractors: picks similar items (same consonant group) to be more challenging.
+// Clean answers: removes parenthetical notes, simplifies for kid-friendly options.
 
 import type { Question, ChoiceQuestion, TypingQuestion, MatchingQuestion, Stage } from "./types";
 
-/**
- * Fisher-Yates shuffle (in-place).
- */
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -17,31 +15,61 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * Get the "consonant group" of a romaji for smart distractor selection.
- * e.g. "ka" → "k", "shi" → "s", "chi" → "t", "fu" → "h"
- * For multi-char romaji (konnichiwa), returns the whole string (no grouping).
+ * Clean a meaning string: remove parenthetical notes, extra info.
+ * "H + A (partikel topik)" → "partikel topik"
+ * "4 (yon lebih umum)" → "4"
+ * "H + U (fu, bukan hu!)" → "fu, bukan hu!"
  */
-function getConsonantGroup(romaji: string): string {
-  // For single-syllable kana (ka, shi, tsu, etc.), extract leading consonant
-  const r = romaji.split("/")[0].trim().toLowerCase(); // take first variant
-  // Single vowel (a, i, u, e, o) - group "vowel"
-  if (/^[aiueo]$/.test(r)) return "vowel";
-  // Consonant + vowel pattern (ka, ki, ku, shi, chi, tsu, etc.)
-  const match = r.match(/^([kgsztcdnhbpmyrwj])[a-z]+/);
-  if (match) return match[1];
-  // For long words (konnichiwa, ohayou), no grouping
-  return r;
+function cleanMeaning(meaning: string): string {
+  // If meaning has format "X (Y)", prefer Y if it's more descriptive
+  // Otherwise just return as-is without the parenthetical
+  const parenMatch = meaning.match(/^(.+?)\s*\((.+)\)$/);
+  if (parenMatch) {
+    const before = parenMatch[1].trim();
+    const inside = parenMatch[2].trim();
+    // If before is like "H + A" or "K + A" (consonant pattern), use inside
+    if (/^[A-Z]\s*\+\s*[A-Z]$/i.test(before)) {
+      return inside;
+    }
+    // If before is a number, keep number (e.g. "4 (yon lebih umum)" → "4")
+    if (/^\d+$/.test(before)) {
+      return before;
+    }
+    // Otherwise keep the before part
+    return before;
+  }
+  return meaning;
 }
 
 /**
- * Smart distractor selection: prefer items from the SAME consonant group,
- * then fall back to similar groups, then random.
- *
- * Strategy:
- * 1. Filter rows in same consonant group (e.g. for "ka": ki, ku, ke, ko)
- * 2. If not enough, add from adjacent groups
- * 3. Fall back to random
+ * Clean romaji: take first variant, remove notes.
+ * "shi/yon" → "shi" (for display)
+ * "hi/ka" → "hi"
  */
+function cleanRomaji(romaji: string): string {
+  return romaji.split("/")[0].trim();
+}
+
+/**
+ * Get all acceptable romaji answers from a romaji string.
+ * "shi/yon" → ["shi", "yon"]
+ * "kyuu/ku" → ["kyuu", "ku"]
+ */
+function getAcceptableRomaji(romaji: string): string[] {
+  return romaji
+    .split("/")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function getConsonantGroup(romaji: string): string {
+  const r = romaji.split("/")[0].trim().toLowerCase();
+  if (/^[aiueo]$/.test(r)) return "vowel";
+  const match = r.match(/^([kgsztcdnhbpmyrwj])[a-z]+/);
+  if (match) return match[1];
+  return r;
+}
+
 function pickSmartDistractors<T>(
   target: T,
   allItems: T[],
@@ -51,33 +79,18 @@ function pickSmartDistractors<T>(
 ): T[] {
   const targetGroup = getConsonantGroup(targetRomaji);
   const others = allItems.filter((item) => item !== target);
-
-  // Group others by consonant group
   const sameGroup = others.filter((item) => getConsonantGroup(getRomaji(item)) === targetGroup);
-  // For vowel group, "adjacent" doesn't apply - just shuffle
   const otherGroups = others.filter((item) => getConsonantGroup(getRomaji(item)) !== targetGroup);
-
-  // Take as many as possible from same group first (most challenging)
   const shuffledSame = shuffle(sameGroup);
   const shuffledOther = shuffle(otherGroups);
-
-  // Mix: prefer same group, but ensure variety
   const distractors: T[] = [];
-  // Take 2-3 from same group if available
   const sameCount = Math.min(shuffledSame.length, count - 1);
   distractors.push(...shuffledSame.slice(0, sameCount));
-  // Fill rest from other groups
   const remaining = count - distractors.length;
   distractors.push(...shuffledOther.slice(0, remaining));
-
-  // Shuffle the final distractors so position is random
   return shuffle(distractors).slice(0, count);
 }
 
-/**
- * Shuffle choice options for a single choice question.
- * Updates the `answer` index to match the new position.
- */
 function shuffleChoiceOptions(q: ChoiceQuestion): ChoiceQuestion {
   if (q.type !== "choice") return q;
   const optionsWithIdx = q.options.map((opt, idx) => ({ opt, isAnswer: idx === q.answer }));
@@ -89,9 +102,6 @@ function shuffleChoiceOptions(q: ChoiceQuestion): ChoiceQuestion {
   };
 }
 
-/**
- * Shuffle matching question pairs (right side only).
- */
 function shuffleMatchingPairs(q: MatchingQuestion): MatchingQuestion {
   if (q.type !== "matching") return q;
   const rightSide = shuffle(q.pairs.map((p) => p.right));
@@ -101,18 +111,12 @@ function shuffleMatchingPairs(q: MatchingQuestion): MatchingQuestion {
   };
 }
 
-/**
- * Randomize a single question (shuffle options without changing content).
- */
 function randomizeQuestion(q: Question): Question {
   if (q.type === "choice") return shuffleChoiceOptions(q);
   if (q.type === "matching") return shuffleMatchingPairs(q);
   return q;
 }
 
-/**
- * Pick N random questions from a stage's question pool.
- */
 export function randomizeStageQuestions(stage: Stage, count?: number): Question[] {
   const pool = stage.questions;
   const targetCount = count ?? pool.length;
@@ -122,8 +126,10 @@ export function randomizeStageQuestions(stage: Stage, count?: number): Question[
 }
 
 /**
- * Generate extra variations of a question by creating "reverse" questions.
- * Now uses SMART distractors (same consonant group) for more challenging battles.
+ * Generate extra variations of a question.
+ * CLEAN answers (no parenthetical notes).
+ * SMART distractors (same consonant group).
+ * NO kana display when kana is the answer.
  */
 export function expandQuestionPool(stage: Stage): Question[] {
   const extra: Question[] = [];
@@ -132,71 +138,67 @@ export function expandQuestionPool(stage: Stage): Question[] {
   const rows = stage.lesson.rows;
 
   for (const row of rows) {
-    // "find the kana for this romaji" - SMART distractors from same consonant group
+    const cleanMeaningVal = row.meaning ? cleanMeaning(row.meaning) : null;
+
+    // 1. "Pilih huruf untuk romaji X" - NO kana display (kana is answer!)
     if (rows.length >= 4) {
       const distractors = pickSmartDistractors(
         row.kana,
         rows.map((r) => r.kana),
         row.romaji,
         3,
-        (k) => {
-          const r = rows.find((row) => row.kana === k);
-          return r?.romaji || "";
-        },
+        (k) => rows.find((row) => row.kana === k)?.romaji || "",
       );
       const options = shuffle([row.kana, ...distractors]);
       extra.push({
         type: "choice",
-        prompt: `Pilih huruf untuk romaji "${row.romaji}"`,
+        prompt: `Pilih huruf untuk romaji "${cleanRomaji(row.romaji)}"`,
+        // NO kana field - don't reveal answer!
         options,
         answer: options.indexOf(row.kana),
-        hint: row.meaning,
+        hint: cleanMeaningVal || undefined,
       });
     }
 
-    // "meaning" question - SMART distractors from similar meaning patterns
-    if (row.meaning) {
+    // 2. "Apa arti dari X?" - SHOW kana (asking meaning, kana is the question)
+    if (cleanMeaningVal && rows.length >= 4) {
       const othersWithMeaning = rows.filter((r) => r.meaning && r.kana !== row.kana);
       if (othersWithMeaning.length >= 3) {
-        // For meaning, prefer items with similar romaji length or same group
-        const distractors = pickSmartDistractors(
-          row.meaning,
-          othersWithMeaning.map((r) => r.meaning!),
+        // Use CLEANED meanings as distractors
+        const distractorMeanings = pickSmartDistractors(
+          cleanMeaningVal,
+          othersWithMeaning.map((r) => cleanMeaning(r.meaning!)),
           row.romaji,
           3,
           (m) => {
-            const r = rows.find((row) => row.meaning === m);
+            const r = rows.find((row) => cleanMeaning(row.meaning || "") === m);
             return r?.romaji || "";
           },
         );
-        const options = shuffle([row.meaning!, ...distractors]);
+        const options = shuffle([cleanMeaningVal, ...distractorMeanings]);
         extra.push({
           type: "choice",
           prompt: `Apa arti dari "${row.kana}"?`,
-          kana: row.kana,
+          kana: row.kana, // Show kana - it's the QUESTION, not the answer
           options,
-          answer: options.indexOf(row.meaning!),
+          answer: options.indexOf(cleanMeaningVal),
         });
       }
     }
 
-    // "find the romaji for this kana" (reverse typing)
+    // 3. "Ketik romaji untuk huruf ini" - SHOW kana (asking to type romaji)
     if (row.romaji) {
-      const acceptableAnswers = row.romaji
-        .split("/")
-        .map((s) => s.trim())
-        .filter(Boolean);
       extra.push({
         type: "typing",
         prompt: `Ketik romaji untuk huruf ini:`,
-        kana: row.kana,
-        answer: acceptableAnswers,
-        hint: row.meaning,
+        kana: row.kana, // Show kana - it's the QUESTION
+        answer: getAcceptableRomaji(row.romaji),
+        hint: cleanMeaningVal || undefined,
       });
     }
 
-    // "which kana matches this meaning" - SMART distractors
-    if (row.meaning && rows.length >= 4) {
+    // 4. "Huruf mana yang berarti X?" - NO kana display (kana is answer!)
+    if (cleanMeaningVal && rows.length >= 4) {
       const othersWithMeaning = rows.filter((r) => r.meaning && r.kana !== row.kana);
       if (othersWithMeaning.length >= 3) {
         const distractors = pickSmartDistractors(
@@ -204,23 +206,42 @@ export function expandQuestionPool(stage: Stage): Question[] {
           othersWithMeaning.map((r) => r.kana),
           row.romaji,
           3,
-          (k) => {
-            const r = rows.find((row) => row.kana === k);
-            return r?.romaji || "";
-          },
+          (k) => rows.find((row) => row.kana === k)?.romaji || "",
         );
         const options = shuffle([row.kana, ...distractors]);
         extra.push({
           type: "choice",
-          prompt: `Huruf mana yang berarti "${row.meaning}"?`,
+          prompt: `Huruf mana yang berarti "${cleanMeaningVal}"?`,
+          // NO kana field - don't reveal answer!
           options,
           answer: options.indexOf(row.kana),
         });
       }
     }
+
+    // 5. NEW: Fill-in-the-blank question (lengkapi kalimat)
+    // Only for lesson rows that have simple meanings (not kanji descriptions)
+    if (cleanMeaningVal && rows.length >= 4) {
+      const distractors = pickSmartDistractors(
+        row.kana,
+        rows.map((r) => r.kana),
+        row.romaji,
+        3,
+        (k) => rows.find((row) => row.kana === k)?.romaji || "",
+      );
+      const options = shuffle([row.kana, ...distractors]);
+      extra.push({
+        type: "choice",
+        prompt: `Lengkapi: ___ = "${cleanMeaningVal}"`,
+        // NO kana - the answer is hidden in the blank!
+        options,
+        answer: options.indexOf(row.kana),
+        hint: `Romaji: ${cleanRomaji(row.romaji)}`,
+      });
+    }
   }
 
-  // Combine original + extra, dedup by prompt+kana
+  // Combine original + extra, dedup by prompt
   const seen = new Set<string>();
   const combined = [...stage.questions, ...extra].filter((q) => {
     const key = q.prompt + (q.type === "choice" || q.type === "typing" ? q.kana ?? "" : "");
@@ -232,13 +253,6 @@ export function expandQuestionPool(stage: Stage): Question[] {
   return combined;
 }
 
-/**
- * Get a randomized, expanded question set for a stage.
- * Scales question count based on stage type:
- * - Regular: 8 questions
- * - Mini-boss: 10 questions
- * - Boss: 12 questions
- */
 export function getBattleQuestions(stage: Stage): Question[] {
   const expanded = expandQuestionPool(stage);
   let count = 8;
