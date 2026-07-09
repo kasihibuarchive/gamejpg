@@ -43,12 +43,12 @@ export const WORLDS: World[] = [
     levelName: "Madya Bawah",
     tagline: "Pelabuhan Transaksi - Bernegosiasi & Berlayar",
     description:
-      "Pelabuhan ramai tempat pedagang berkumpul. Konjugasi kata kerja (te/nai/ta-form), partikel kompleks, dan Kanji lanjutan. Bab 1 (Stage 1-10): Verb forms & daily life. Bab 2 (Stage 11-20): Kanji lanjutan & ujian adaptif.",
+      "Pelabuhan ramai tempat pedagang berkumpul. Konjugasi kata kerja, partikel kompleks, dan Kanji lanjutan. Bab 1 (Stage 1-10): Verb forms. Bab 2 (Stage 11-20): Kanji & grammar. Bab 3 (Stage 21-30): Ujian adaptif. Bab 4 (Stage 31-40): Ujian akhir & kosakata sehari-hari.",
     color: "var(--kq-n4)",
     colorDark: "var(--kq-n4-dark)",
     icon: "⚓",
-    stageCount: 20,
-    chapterCount: 2,
+    stageCount: 40,
+    chapterCount: 4,
   },
   {
     id: "n3",

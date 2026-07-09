@@ -963,7 +963,7 @@ export function getStage(id: string): Stage | undefined {
 export function getWorldUnlockForStage(stageId: string): WorldId | undefined {
   if (stageId === "hajimari-10" || stageId === "hajimari-20") return "n5";
   if (stageId === "n5-20") return "n4";
-  if (stageId === "n4-10" || stageId === "n4-20") return "n3";
+  if (stageId === "n4-40") return "n3";
   if (stageId === "n3-10" || stageId === "n3-20") return "n2";
   if (stageId === "n2-10" || stageId === "n2-20") return "n1";
   return undefined;
