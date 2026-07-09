@@ -307,7 +307,7 @@ export function StageSelect() {
                     MODUL DALAM PENGEMBANGAN
                   </h3>
                   <p className="font-vt text-base text-black/80">
-                    Bab {world.jlpt} akan segera hadir! Sementara itu, kuasai
+                    Bab {world.levelName} akan segera hadir! Sementara itu, kuasai
                     dulu bab-bab sebelumnya dengan sempurna.
                   </p>
                 </PixelPanel>

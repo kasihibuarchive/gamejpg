@@ -1,6 +1,6 @@
 import type { Stage } from "./types";
 
-// ===== MINATO PORT - JLPT N4 (20 STAGES, 2 CHAPTERS) =====
+// ===== MINATO PORT - Tingkat Madya Bawah (20 STAGES, 2 CHAPTERS) =====
 // Chapter 1 (Stage 1-10): Verb forms (te/nai/ta), daily conversation, basic kanji 100-200
 // Chapter 2 (Stage 11-20): Advanced grammar, more kanji 200-300, complex sentences
 // Story: Player arrives at Minato Port, helps sailors & merchants, fixes ships, explores islands
@@ -804,9 +804,9 @@ export const N4_STAGES: Stage[] = [
     ],
     outro: [
       "Lord Kaizoku tertawa: «Kau benar-benar pahlawan! N4 adalah milikmu!»",
-      "Ia menyerahkan mahkota emas. «Lanjut ke Kage Clan - JLPT N3 menunggu!»",
+      "Ia menyerahkan mahkota emas. «Lanjut ke Kage Clan - Tingkat Madya menunggu!»",
       "**BAB 2 N4 SELESAI! +800 XP, 300 koin, Badge: Penguasa N4, Item: Mahkota Bajak Laut**",
-      "**Dunia baru terbuka: Kage Clan (JLPT N3)**",
+      "**Dunia baru terbuka: Kage Clan (Tingkat Madya)**",
     ],
     lesson: undefined,
     enemies: [

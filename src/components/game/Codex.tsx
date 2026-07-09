@@ -269,7 +269,7 @@ export function Codex() {
                   <span className="text-2xl">{isUnlocked ? world.icon : "🔒"}</span>
                   <div className="flex-1 min-w-0">
                     <div className="font-pixel text-[0.55rem] truncate" style={{ color: "var(--kq-panel-border)" }}>
-                      {world.name} · JLPT {world.jlpt}
+                      {world.name} · {world.levelName}
                     </div>
                     <div className="font-vt text-sm text-black/70">
                       {completed}/{world.stageCount} stage selesai

@@ -839,10 +839,10 @@ export const HAJIMARI_STAGES: Stage[] = [
       "「Kau... mengingatku. Kau mengingat semua huruf...」 suaranya memudar. 「Mungkin... aku bukan musuh. Aku hanya... ingin diingat.」",
       "Partikel itu berkumpul menjadi sebuah komet keemasan yang melayang ke langit.",
       "Yuki menangis bahagia. 「Kau menyelamatkan desa. Lebih dari itu - kau menyelamatkan semua huruf yang dilupakan.」",
-      "Pintu gerbang kuno muncul di hutan. Di atasnya tertulis: **Vassal Kingdom - JLPT N5**.",
+      "Pintu gerbang kuno muncul di hutan. Di atasnya tertulis: **Vassal Kingdom - Tingkat Dasar**.",
       "Yuki: 「Paspor Petualang adalah tiketmu. Pergilah, sang pahlawan. Petualanganmu baru saja dimulai.」",
       "**BAB 1 SELESAI! +500 XP, Badge: Pahlawan Hajimari, Item: Paspor Petualang**",
-      "**Dunia baru terbuka: Vassal Kingdom (JLPT N5)**",
+      "**Dunia baru terbuka: Vassal Kingdom (Tingkat Dasar)**",
     ],
     lesson: {
       title: "Teka-Teki Kata Utuh",
@@ -962,10 +962,10 @@ export function getStage(id: string): Stage | undefined {
 // World unlock logic: which world does completing a boss stage unlock?
 export function getWorldUnlockForStage(stageId: string): WorldId | undefined {
   if (stageId === "hajimari-10" || stageId === "hajimari-20") return "n5";
-  if (stageId === "n5-10") return "n4";
+  if (stageId === "n5-20") return "n4";
   if (stageId === "n4-10" || stageId === "n4-20") return "n3";
-  if (stageId === "n3-10") return "n2";
-  if (stageId === "n2-10") return "n1";
+  if (stageId === "n3-10" || stageId === "n3-20") return "n2";
+  if (stageId === "n2-10" || stageId === "n2-20") return "n1";
   return undefined;
 }
 

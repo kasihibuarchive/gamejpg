@@ -118,7 +118,8 @@ export interface World {
   id: WorldId;
   name: string;
   nameJp: string;
-  jlpt: "DASAR" | "N5" | "N4" | "N3" | "N2" | "N1";
+  level: number; // 1-6 (bukan JLPT, hanya tingkat kesulitan game)
+  levelName: string; // "Pemula", "Dasar", "Madya", dll
   tagline: string;
   description: string;
   color: string;

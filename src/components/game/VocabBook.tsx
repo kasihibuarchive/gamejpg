@@ -93,7 +93,7 @@ export function VocabBook() {
             </div>
             {WORLDS.filter((w) => worldCounts[w.id]).map((w) => (
               <div key={w.id} className="p-2 text-center" style={{ background: w.color, border: `2px solid var(--kq-panel-border)` }}>
-                <div className="font-pixel text-[0.4rem] text-black/70">{w.icon} {w.jlpt}</div>
+                <div className="font-pixel text-[0.4rem] text-black/70">{w.icon} {w.levelName}</div>
                 <div className="font-pixel text-lg text-black">{worldCounts[w.id]}</div>
               </div>
             ))}
@@ -137,7 +137,7 @@ export function VocabBook() {
                   color: "var(--kq-panel-border)",
                 }}
               >
-                <span className="font-pixel text-[0.45rem]">{w.icon} {w.jlpt} ({worldCounts[w.id]})</span>
+                <span className="font-pixel text-[0.45rem]">{w.icon} {w.levelName} ({worldCounts[w.id]})</span>
               </button>
             ))}
           </div>

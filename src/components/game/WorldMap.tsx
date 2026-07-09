@@ -108,7 +108,7 @@ export function WorldMap() {
                           className="font-pixel text-[0.55rem] mb-0.5"
                           style={{ color: "var(--kq-panel-border)" }}
                         >
-                          CHAPTER {idx + 1} · JLPT {world.jlpt}
+                          CHAPTER {idx + 1} · {world.levelName}
                         </div>
                         <div
                           className="font-pixel text-[0.7rem] truncate"

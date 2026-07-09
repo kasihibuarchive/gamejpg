@@ -258,7 +258,7 @@ export function BattleScreen() {
     let unlockWorld: any = undefined;
     if (victory && stage) {
       if (stage.id === "hajimari-10" || stage.id === "hajimari-20") unlockWorld = "n5";
-      else if (stage.id === "n5-10") unlockWorld = "n4";
+      else if (stage.id === "n5-20") unlockWorld = "n4";
       else if (stage.id === "n4-10" || stage.id === "n4-20") unlockWorld = "n3";
     }
 

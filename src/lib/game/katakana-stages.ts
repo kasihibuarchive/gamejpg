@@ -825,7 +825,7 @@ export const KATAKANA_STAGES: Stage[] = [
       "Yuki: «Kau benar-benar pahlawan Hajimari! Sekarang kau siap ke kerajaan manusia - Vassal Kingdom!»",
       "Penduduk desa berkumpul, merayakanmu. Paspor Petualang kini bersinar dengan dua warna.",
       "**BAB 2 SELESAI! +600 XP, 200 koin, Badge: Master Aksara, Item: Permata Aksara**",
-      "**Dunia baru sepenuhnya terbuka: Vassal Kingdom (JLPT N5)**",
+      "**Dunia baru sepenuhnya terbuka: Vassal Kingdom (Tingkat Dasar)**",
     ],
     lesson: {
       title: "Ujian Akhir Katakana",
