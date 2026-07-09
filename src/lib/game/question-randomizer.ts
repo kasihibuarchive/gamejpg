@@ -1,6 +1,6 @@
 // ===== QUESTION RANDOMIZER =====
 // Shuffles question order and choice options each battle.
-// Also expands the question pool with variations.
+// Smart distractors: picks similar items (same consonant group) to be more challenging.
 
 import type { Question, ChoiceQuestion, TypingQuestion, MatchingQuestion, Stage } from "./types";
 
@@ -14,6 +14,64 @@ function shuffle<T>(arr: T[]): T[] {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+/**
+ * Get the "consonant group" of a romaji for smart distractor selection.
+ * e.g. "ka" → "k", "shi" → "s", "chi" → "t", "fu" → "h"
+ * For multi-char romaji (konnichiwa), returns the whole string (no grouping).
+ */
+function getConsonantGroup(romaji: string): string {
+  // For single-syllable kana (ka, shi, tsu, etc.), extract leading consonant
+  const r = romaji.split("/")[0].trim().toLowerCase(); // take first variant
+  // Single vowel (a, i, u, e, o) - group "vowel"
+  if (/^[aiueo]$/.test(r)) return "vowel";
+  // Consonant + vowel pattern (ka, ki, ku, shi, chi, tsu, etc.)
+  const match = r.match(/^([kgsztcdnhbpmyrwj])[a-z]+/);
+  if (match) return match[1];
+  // For long words (konnichiwa, ohayou), no grouping
+  return r;
+}
+
+/**
+ * Smart distractor selection: prefer items from the SAME consonant group,
+ * then fall back to similar groups, then random.
+ *
+ * Strategy:
+ * 1. Filter rows in same consonant group (e.g. for "ka": ki, ku, ke, ko)
+ * 2. If not enough, add from adjacent groups
+ * 3. Fall back to random
+ */
+function pickSmartDistractors<T>(
+  target: T,
+  allItems: T[],
+  targetRomaji: string,
+  count: number,
+  getRomaji: (item: T) => string,
+): T[] {
+  const targetGroup = getConsonantGroup(targetRomaji);
+  const others = allItems.filter((item) => item !== target);
+
+  // Group others by consonant group
+  const sameGroup = others.filter((item) => getConsonantGroup(getRomaji(item)) === targetGroup);
+  // For vowel group, "adjacent" doesn't apply - just shuffle
+  const otherGroups = others.filter((item) => getConsonantGroup(getRomaji(item)) !== targetGroup);
+
+  // Take as many as possible from same group first (most challenging)
+  const shuffledSame = shuffle(sameGroup);
+  const shuffledOther = shuffle(otherGroups);
+
+  // Mix: prefer same group, but ensure variety
+  const distractors: T[] = [];
+  // Take 2-3 from same group if available
+  const sameCount = Math.min(shuffledSame.length, count - 1);
+  distractors.push(...shuffledSame.slice(0, sameCount));
+  // Fill rest from other groups
+  const remaining = count - distractors.length;
+  distractors.push(...shuffledOther.slice(0, remaining));
+
+  // Shuffle the final distractors so position is random
+  return shuffle(distractors).slice(0, count);
 }
 
 /**
@@ -54,28 +112,18 @@ function randomizeQuestion(q: Question): Question {
 
 /**
  * Pick N random questions from a stage's question pool.
- * If pool size > N, shuffles and picks subset.
- * Also shuffles options within each question.
  */
 export function randomizeStageQuestions(stage: Stage, count?: number): Question[] {
   const pool = stage.questions;
   const targetCount = count ?? pool.length;
-
-  // Shuffle order
   const shuffled = shuffle(pool);
-
-  // Take subset if count < pool length
   const selected = shuffled.slice(0, Math.min(targetCount, shuffled.length));
-
-  // Randomize options within each question
   return selected.map(randomizeQuestion);
 }
 
 /**
  * Generate extra variations of a question by creating "reverse" questions.
- * E.g., "Huruf apa ini? あ" → "Pilih huruf 'a':" with あ as one option.
- * This expands the pool without manual authoring.
- * Now generates MORE variations for better battle length.
+ * Now uses SMART distractors (same consonant group) for more challenging battles.
  */
 export function expandQuestionPool(stage: Stage): Question[] {
   const extra: Question[] = [];
@@ -83,12 +131,19 @@ export function expandQuestionPool(stage: Stage): Question[] {
   if (!stage.lesson) return stage.questions;
   const rows = stage.lesson.rows;
 
-  // For each lesson row, generate ALL possible variations (not random)
   for (const row of rows) {
-    // Always add: "find the kana for this romaji" (if 4+ rows for distractors)
+    // "find the kana for this romaji" - SMART distractors from same consonant group
     if (rows.length >= 4) {
-      const others = rows.filter((r) => r.kana !== row.kana);
-      const distractors = shuffle(others).slice(0, 3).map((r) => r.kana);
+      const distractors = pickSmartDistractors(
+        row.kana,
+        rows.map((r) => r.kana),
+        row.romaji,
+        3,
+        (k) => {
+          const r = rows.find((row) => row.kana === k);
+          return r?.romaji || "";
+        },
+      );
       const options = shuffle([row.kana, ...distractors]);
       extra.push({
         type: "choice",
@@ -99,11 +154,21 @@ export function expandQuestionPool(stage: Stage): Question[] {
       });
     }
 
-    // Always add: "meaning" question if meaning exists
+    // "meaning" question - SMART distractors from similar meaning patterns
     if (row.meaning) {
-      const others = rows.filter((r) => r.meaning && r.kana !== row.kana);
-      if (others.length >= 3) {
-        const distractors = shuffle(others).slice(0, 3).map((r) => r.meaning!);
+      const othersWithMeaning = rows.filter((r) => r.meaning && r.kana !== row.kana);
+      if (othersWithMeaning.length >= 3) {
+        // For meaning, prefer items with similar romaji length or same group
+        const distractors = pickSmartDistractors(
+          row.meaning,
+          othersWithMeaning.map((r) => r.meaning!),
+          row.romaji,
+          3,
+          (m) => {
+            const r = rows.find((row) => row.meaning === m);
+            return r?.romaji || "";
+          },
+        );
         const options = shuffle([row.meaning!, ...distractors]);
         extra.push({
           type: "choice",
@@ -115,10 +180,8 @@ export function expandQuestionPool(stage: Stage): Question[] {
       }
     }
 
-    // Always add: "find the romaji for this kana" (reverse typing)
+    // "find the romaji for this kana" (reverse typing)
     if (row.romaji) {
-      // Split romaji on "/" to support multiple acceptable answers
-      // e.g. "kyuu/ku" → ["kyuu", "ku"]
       const acceptableAnswers = row.romaji
         .split("/")
         .map((s) => s.trim())
@@ -132,11 +195,20 @@ export function expandQuestionPool(stage: Stage): Question[] {
       });
     }
 
-    // Add: "which kana matches this meaning" question
+    // "which kana matches this meaning" - SMART distractors
     if (row.meaning && rows.length >= 4) {
-      const others = rows.filter((r) => r.meaning && r.kana !== row.kana);
-      if (others.length >= 3) {
-        const distractors = shuffle(others).slice(0, 3).map((r) => r.kana);
+      const othersWithMeaning = rows.filter((r) => r.meaning && r.kana !== row.kana);
+      if (othersWithMeaning.length >= 3) {
+        const distractors = pickSmartDistractors(
+          row.kana,
+          othersWithMeaning.map((r) => r.kana),
+          row.romaji,
+          3,
+          (k) => {
+            const r = rows.find((row) => row.kana === k);
+            return r?.romaji || "";
+          },
+        );
         const options = shuffle([row.kana, ...distractors]);
         extra.push({
           type: "choice",
@@ -162,19 +234,18 @@ export function expandQuestionPool(stage: Stage): Question[] {
 
 /**
  * Get a randomized, expanded question set for a stage.
- * Now scales question count based on stage type:
+ * Scales question count based on stage type:
  * - Regular: 8 questions
  * - Mini-boss: 10 questions
  * - Boss: 12 questions
  */
 export function getBattleQuestions(stage: Stage): Question[] {
   const expanded = expandQuestionPool(stage);
-  // Scale question count by stage type
-  let count = 8; // default
+  let count = 8;
   if (stage.type === "mini-boss") count = 10;
   if (stage.type === "boss") count = 12;
-  count = Math.min(count, expanded.length); // can't exceed pool
-  count = Math.max(count, stage.questions.length); // at least original count
+  count = Math.min(count, expanded.length);
+  count = Math.max(count, stage.questions.length);
   const fakeStage = { ...stage, questions: expanded };
   return randomizeStageQuestions(fakeStage, count);
 }
