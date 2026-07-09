@@ -114,10 +114,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Dermaga Perbaikan Kapal**",
-      "Tukang kayu: 「これを なおして ください! Perbaiki ini!»",
-      "「Bentuk 〜て ください = mohon/permintaan sopan. Pelajari!»",
+      "Tukang kayu: 「これを なおして ください! Perbaiki ini!」",
+      "「Bentuk 〜て ください = mohon/permintaan sopan. Pelajari!」",
     ],
-    outro: ["Kapal terpasang. Tukang: «Terima kasih, pengelana!»", "**Stage 3 selesai! +100 XP**"],
+    outro: ["Kapal terpasang. Tukang: 「Terima kasih, pengelana!」", "**Stage 3 selesai! +100 XP**"],
     lesson: {
       title: "〜て ください (Permintaan)",
       rows: [
@@ -154,10 +154,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Pasar Ikan**",
-      "Pedagang ikan: 「さかなを たべない? Tidak makan ikan?»",
-      "「Bentuk 〜ない = negatif kata kerja. Pelajari!»",
+      "Pedagang ikan: 「さかなを たべない? Tidak makan ikan?」",
+      "「Bentuk 〜ない = negatif kata kerja. Pelajari!」",
     ],
-    outro: ["Pedagang: «Paham negatif sekarang!»", "**Stage 4 selesai! +110 XP**"],
+    outro: ["Pedagang: 「Paham negatif sekarang!」", "**Stage 4 selesai! +110 XP**"],
     lesson: {
       title: "nai-form (Negatif)",
       rows: [
@@ -197,10 +197,10 @@ export const N4_STAGES: Stage[] = [
     type: "lesson",
     intro: [
       "**Warung Soba**",
-      "Pelayan: 「もう たべた? Sudah makan?»",
-      "「Bentuk 〜た = lampau (sudah). Pelajari!»",
+      "Pelayan: 「もう たべた? Sudah makan?」",
+      "「Bentuk 〜た = lampau (sudah). Pelajari!」",
     ],
-    outro: ["Pelayan: «Sekarang bisa cerita masa lalu!»", "**Stage 5 selesai! +120 XP**"],
+    outro: ["Pelayan: 「Sekarang bisa cerita masa lalu!」", "**Stage 5 selesai! +120 XP**"],
     lesson: {
       title: "ta-form (Lampau)",
       rows: [
@@ -240,10 +240,10 @@ export const N4_STAGES: Stage[] = [
     type: "mini-boss",
     intro: [
       "**Gudang Pelabuhan**",
-      "Sesosok pria tua berjanggut muncul: 「Aku **Konju**, master konjugasi. Lemati ujianku!»",
-      "「Kau harus menguasai semua bentuk: ます, て, ない, た. Mulai!»",
+      "Sesosok pria tua berjanggut muncul: 「Aku **Konju**, master konjugasi. Lemati ujianku!」",
+      "「Kau harus menguasai semua bentuk: ます, て, ない, た. Mulai!」",
     ],
-    outro: ["Konju: «Kau lulus! Lanjut ke pulau utama.»", "**Stage 6 selesai! +180 XP, Badge: Lulus Konjugasi**"],
+    outro: ["Konju: 「Kau lulus! Lanjut ke pulau utama.」", "**Stage 6 selesai! +180 XP, Badge: Lulus Konjugasi**"],
     lesson: undefined,
     enemies: [
       { id: "konju", name: "Konju Master Konjugasi", sprite: "🧙‍♂️", hp: 40, attack: 6, color: "#7c4dff", abilities: ["enrage", "shield", "counter"] },
@@ -272,10 +272,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Peta Pelabuhan**",
-      "Navigator: 「どこへ いきますか? Mau ke mana?»",
-      "「Partikel に (tujuan), で (lokasi aksi), へ (arah). Pelajari!»",
+      "Navigator: 「どこへ いきますか? Mau ke mana?」",
+      "「Partikel に (tujuan), で (lokasi aksi), へ (arah). Pelajari!」",
     ],
-    outro: ["Navigator: «Sekarang kau bisa cari arah!»", "**Stage 7 selesai! +130 XP**"],
+    outro: ["Navigator: 「Sekarang kau bisa cari arah!」", "**Stage 7 selesai! +130 XP**"],
     lesson: {
       title: "Partikel に・で・へ",
       rows: [
@@ -312,10 +312,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Toko Pakaian**",
-      "Penjahit: 「この ふくは たかかった! Baju ini mahal!»",
-      "「Sifat -i bentuk lampau: 〜かった. Sifat -na: 〜だった. Pelajari!»",
+      "Penjahit: 「この ふくは たかかった! Baju ini mahal!」",
+      "「Sifat -i bentuk lampau: 〜かった. Sifat -na: 〜だった. Pelajari!」",
     ],
-    outro: ["Penjahit: «Sekarang bisa deskripsi masa lalu!»", "**Stage 8 selesai! +140 XP**"],
+    outro: ["Penjahit: 「Sekarang bisa deskripsi masa lalu!」", "**Stage 8 selesai! +140 XP**"],
     lesson: {
       title: "Sifat Lampau",
       rows: [
@@ -353,10 +353,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Kafe Pelabuhan**",
-      "Anak kecil: 「アイスクリームを たべたい! Ingin makan es krim!»",
-      "「Bentuk 〜たい = ingin. Pelajari!»",
+      "Anak kecil: 「アイスクリームを たべたい! Ingin makan es krim!」",
+      "「Bentuk 〜たい = ingin. Pelajari!」",
     ],
-    outro: ["Anak kecil tersenyum: «Paham keinginan sekarang!»", "**Stage 9 selesai! +150 XP**"],
+    outro: ["Anak kecil tersenyum: 「Paham keinginan sekarang!」", "**Stage 9 selesai! +150 XP**"],
     lesson: {
       title: "〜たい (Ingin)",
       rows: [
@@ -392,12 +392,12 @@ export const N4_STAGES: Stage[] = [
     type: "boss",
     intro: [
       "**Kapal Besar di Dermaga**",
-      "Di kapal terbesar, **Captain Maru** menunggu. 「Pengelana, kalahkan aku untuk dapat tiket ke pulau utama!»",
-      "「Ujian akhir Bab 1: gabungan verb forms, particles, sifat, keinginan!»",
+      "Di kapal terbesar, **Captain Maru** menunggu. 「Pengelana, kalahkan aku untuk dapat tiket ke pulau utama!」",
+      "「Ujian akhir Bab 1: gabungan verb forms, particles, sifat, keinginan!」",
       "**PERTARUNGAN AKHIR BAB 1 N4**",
     ],
     outro: [
-      "Captain Maru tertawa: «Kau hebat! Tiket ke pulau utama adalah milikmu!»",
+      "Captain Maru tertawa: 「Kau hebat! Tiket ke pulau utama adalah milikmu!」",
       "**BAB 1 N4 SELESAI! +500 XP, Badge: Pengelana Pelabuhan, Item: Tiket Pulau**",
     ],
     lesson: undefined,
@@ -430,10 +430,10 @@ export const N4_STAGES: Stage[] = [
     type: "lesson",
     intro: [
       "**Pulau Utama - Pasar Besar**",
-      "Setelah sampai pulau utama, kau lihat pedagang pakai angka besar: 「百円! 千円! 万円!»",
-      "「Kanji angka besar: 百 (100), 千 (1000), 万 (10000). Pelajari!»",
+      "Setelah sampai pulau utama, kau lihat pedagang pakai angka besar: 「百円! 千円! 万円!」",
+      "「Kanji angka besar: 百 (100), 千 (1000), 万 (10000). Pelajari!」",
     ],
-    outro: ["Pedagang: «Sekarang kau bisa baca harga!»", "**Stage 11 selesai! +160 XP**"],
+    outro: ["Pedagang: 「Sekarang kau bisa baca harga!」", "**Stage 11 selesai! +160 XP**"],
     lesson: {
       title: "Kanji Angka Besar",
       rows: [
@@ -473,10 +473,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Menara Jam Pulau**",
-      "Penjaga jam: 「何時ですか? Pukul berapa?»",
-      "「Kanji waktu: 年 (tahun), 月 (bulan), 日 (hari), 時 (jam), 分 (menit).»",
+      "Penjaga jam: 「何時ですか? Pukul berapa?」",
+      "「Kanji waktu: 年 (tahun), 月 (bulan), 日 (hari), 時 (jam), 分 (menit).」",
     ],
-    outro: ["Penjaga: «Sekarang bisa baca tanggal & jam!»", "**Stage 12 selesai! +170 XP**"],
+    outro: ["Penjaga: 「Sekarang bisa baca tanggal & jam!」", "**Stage 12 selesai! +170 XP**"],
     lesson: {
       title: "Kanji Waktu",
       rows: [
@@ -516,10 +516,10 @@ export const N4_STAGES: Stage[] = [
     type: "lesson",
     intro: [
       "**Rumah Keluarga Pelaut**",
-      "Keluarga pelaut menyambut: 「ちちとははとあにとあねと...»",
-      "「Kanji keluarga: 父 (ayah), 母 (ibu), 兄 (kakak laki), 姉 (kakak perempuan). Pelajari!»",
+      "Keluarga pelaut menyambut: 「ちちとははとあにとあねと...」",
+      "「Kanji keluarga: 父 (ayah), 母 (ibu), 兄 (kakak laki), 姉 (kakak perempuan). Pelajari!」",
     ],
-    outro: ["Keluarga: «Sekarang kenal keluarga Jepang!»", "**Stage 13 selesai! +180 XP**"],
+    outro: ["Keluarga: 「Sekarang kenal keluarga Jepang!」", "**Stage 13 selesai! +180 XP**"],
     lesson: {
       title: "Kanji Keluarga",
       rows: [
@@ -559,10 +559,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Bukit Pulau**",
-      "Pemandu: 「やまとうみとそら! Gunung, laut, langit!»",
-      "「Kanji alam: 山 (gunung), 川 (sungai), 海 (laut), 空 (langit), 雨 (hujan).»",
+      "Pemandu: 「やまとうみとそら! Gunung, laut, langit!」",
+      "「Kanji alam: 山 (gunung), 川 (sungai), 海 (laut), 空 (langit), 雨 (hujan).」",
     ],
-    outro: ["Pemandu: «Pemandangan pulau kini bisa deskripsikan!»", "**Stage 14 selesai! +190 XP**"],
+    outro: ["Pemandu: 「Pemandangan pulau kini bisa deskripsikan!」", "**Stage 14 selesai! +190 XP**"],
     lesson: {
       title: "Kanji Alam",
       rows: [
@@ -602,10 +602,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Klinik Pulau**",
-      "Dokter: 「めとくちとて! Mata, mulut, tangan!»",
-      "「Kanji tubuh: 目 (mata), 口 (mulut), 手 (tangan), 足 (kaki), 心 (hati).»",
+      "Dokter: 「めとくちとて! Mata, mulut, tangan!」",
+      "「Kanji tubuh: 目 (mata), 口 (mulut), 手 (tangan), 足 (kaki), 心 (hati).」",
     ],
-    outro: ["Dokter: «Sekarang bisa periksa bagian tubuh!»", "**Stage 15 selesai! +200 XP**"],
+    outro: ["Dokter: 「Sekarang bisa periksa bagian tubuh!」", "**Stage 15 selesai! +200 XP**"],
     lesson: {
       title: "Kanji Tubuh",
       rows: [
@@ -645,10 +645,10 @@ export const N4_STAGES: Stage[] = [
     type: "lesson",
     intro: [
       "**Tavern Pulau**",
-      "Pemilik tavern: 「あめが ふったら、 いかない! Kalau hujan, tidak pergi!»",
-      "「Bentuk 〜たら = jika. Pelajari!»",
+      "Pemilik tavern: 「あめが ふったら、 いかない! Kalau hujan, tidak pergi!」",
+      "「Bentuk 〜たら = jika. Pelajari!」",
     ],
-    outro: ["Pemilik: «Sekarang bisa kalimat bersyarat!»", "**Stage 16 selesai! +210 XP**"],
+    outro: ["Pemilik: 「Sekarang bisa kalimat bersyarat!」", "**Stage 16 selesai! +210 XP**"],
     lesson: {
       title: "〜たら (Jika)",
       rows: [
@@ -683,10 +683,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Balai Kota Pulau**",
-      "Petugas: 「あめだから、 いきません。でも、 あした いきます!»",
-      "「から = karena, でも = tetapi. Pelajari!»",
+      "Petugas: 「あめだから、 いきません。でも、 あした いきます!」",
+      "「から = karena, でも = tetapi. Pelajari!」",
     ],
-    outro: ["Petugas: «Sekarang bisa kasih alasan & bantah!»", "**Stage 17 selesai! +220 XP**"],
+    outro: ["Petugas: 「Sekarang bisa kasih alasan & bantah!」", "**Stage 17 selesai! +220 XP**"],
     lesson: {
       title: "から・でも",
       rows: [
@@ -721,10 +721,10 @@ export const N4_STAGES: Stage[] = [
     type: "lesson",
     intro: [
       "**Toko Hadiah**",
-      "Penjaga toko: 「これを あなたに あげます! Ini saya berikan padamu!»",
-      "「あげる (beri), もらう (terima), くれる (beri ke saya). Pelajari!»",
+      "Penjaga toko: 「これを あなたに あげます! Ini saya berikan padamu!」",
+      "「あげる (beri), もらう (terima), くれる (beri ke saya). Pelajari!」",
     ],
-    outro: ["Penjaga: «Sekarang bisa transaksi hadiah!»", "**Stage 18 selesai! +230 XP**"],
+    outro: ["Penjaga: 「Sekarang bisa transaksi hadiah!」", "**Stage 18 selesai! +230 XP**"],
     lesson: {
       title: "あげる・もらう・くれる",
       rows: [
@@ -760,10 +760,10 @@ export const N4_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Pengadilan Pulau**",
-      "Hakim: 「ぬすまれた! Dicuri!»",
-      "「Pasif: 〜られる (grup 1), 〜れる (grup 2). Pelajari!»",
+      "Hakim: 「ぬすまれた! Dicuri!」",
+      "「Pasif: 〜られる (grup 1), 〜れる (grup 2). Pelajari!」",
     ],
-    outro: ["Hakim: «Sekarang bisa lapor pasif!»", "**Stage 19 selesai! +240 XP**"],
+    outro: ["Hakim: 「Sekarang bisa lapor pasif!」", "**Stage 19 selesai! +240 XP**"],
     lesson: {
       title: "Pasif",
       rows: [
@@ -798,13 +798,13 @@ export const N4_STAGES: Stage[] = [
     type: "boss",
     intro: [
       "**Kapal Bajak Laut Besar**",
-      "Di geladak kapal bajak laut, **Lord Kaizoku** menunggu. 「Pengelana, kalahkan aku untuk kuasai seluruh N4!»",
-      "「Ujian akhir: gabungan semua N4 - verb forms, kanji, grammar, pasif, kondisional!»",
+      "Di geladak kapal bajak laut, **Lord Kaizoku** menunggu. 「Pengelana, kalahkan aku untuk kuasai seluruh N4!」",
+      "「Ujian akhir: gabungan semua N4 - verb forms, kanji, grammar, pasif, kondisional!」",
       "**PERTARUNGAN AKHIR BAB 2 N4**",
     ],
     outro: [
-      "Lord Kaizoku tertawa: «Kau benar-benar pahlawan! N4 adalah milikmu!»",
-      "Ia menyerahkan mahkota emas. «Lanjut ke Bab 3: Ujian Akademi Pelabuhan!»",
+      "Lord Kaizoku tertawa: 「Kau benar-benar pahlawan! N4 adalah milikmu!」",
+      "Ia menyerahkan mahkota emas. 「Lanjut ke Bab 3: Ujian Akademi Pelabuhan!」",
       "**BAB 2 N4 SELESAI! +800 XP, 300 koin, Badge: Penguasa Pelabuhan, Item: Mahkota Bajak Laut**",
       "**Bab 3 terbuka: Ujian Adaptif (Stage 21-30)**",
     ],
@@ -835,8 +835,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-21", worldId: "n4", index: 21, chapter: 3,
     title: "Akademi Pelabuhan", subtitle: "Transisi: opsi pakai kana",
     type: "lesson",
-    intro: ["**Akademi Pelabuhan Minato**", "Penguji: «Selamat datang di ujian akademi. Opsi jawaban mulai pakai huruf Jepang penuh!»"],
-    outro: ["Penguji: «Kau mulai terbiasa!»", "**Stage 21 selesai! +150 XP**"],
+    intro: ["**Akademi Pelabuhan Minato**", "Penguji: 「Selamat datang di ujian akademi. Opsi jawaban mulai pakai huruf Jepang penuh!」"],
+    outro: ["Penguji: 「Kau mulai terbiasa!」", "**Stage 21 selesai! +150 XP**"],
     lesson: { title: "Transisi ke Kana", rows: [
       { kana: "???", romaji: "taberu", meaning: "makan (kasual)" },
       { kana: "??", romaji: "nomu", meaning: "minum (kasual)" },
@@ -860,8 +860,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-22", worldId: "n4", index: 22, chapter: 3,
     title: "Full Kana - Verba", subtitle: "Opsi full kana, tanpa romaji",
     type: "battle",
-    intro: ["**Ruang Ujian 1**", "Penguji: «Sekarang semua opsi pakai ????. Tidak ada romaji!»"],
-    outro: ["Penguji: «Kau bisa baca kana!»", "**Stage 22 selesai! +170 XP**"],
+    intro: ["**Ruang Ujian 1**", "Penguji: 「Sekarang semua opsi pakai ????. Tidak ada romaji!」"],
+    outro: ["Penguji: 「Kau bisa baca kana!」", "**Stage 22 selesai! +170 XP**"],
     lesson: { title: "Verba Sehari-hari (Kana)", rows: [
       { kana: "???", romaji: "okiru", meaning: "bangun (tidur)" },
       { kana: "??", romaji: "neru", meaning: "tidur" },
@@ -886,8 +886,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-23", worldId: "n4", index: 23, chapter: 3,
     title: "Kanji Verba", subtitle: "Kanji di soal verba",
     type: "battle",
-    intro: ["**Ruang Ujian 2**", "Penguji: «Kanji verba sekarang! ?, ?, ?, ?, ?!»"],
-    outro: ["Penguji: «Kanji verba terkuasai!»", "**Stage 23 selesai! +190 XP**"],
+    intro: ["**Ruang Ujian 2**", "Penguji: 「Kanji verba sekarang! ?, ?, ?, ?, ?!」"],
+    outro: ["Penguji: 「Kanji verba terkuasai!」", "**Stage 23 selesai! +190 XP**"],
     lesson: { title: "Kanji Verba", rows: [
       { kana: "???", romaji: "taberu", meaning: "makan" },
       { kana: "??", romaji: "nomu", meaning: "minum" },
@@ -915,8 +915,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-24", worldId: "n4", index: 24, chapter: 3,
     title: "Kalimat Kompleks", subtitle: "Kalimat dengan konjugasi",
     type: "battle",
-    intro: ["**Ruang Ujian 3**", "Penguji: «Kalimat kompleks dengan konjugasi penuh!»"],
-    outro: ["Penguji: «Kalimat kompleks terkuasai!»", "**Stage 24 selesai! +210 XP**"],
+    intro: ["**Ruang Ujian 3**", "Penguji: 「Kalimat kompleks dengan konjugasi penuh!」"],
+    outro: ["Penguji: 「Kalimat kompleks terkuasai!」", "**Stage 24 selesai! +210 XP**"],
     lesson: { title: "Kalimat Konjugasi", rows: [
       { kana: "?? ?????", romaji: "mou tabemashita", meaning: "sudah makan" },
       { kana: "?? ??????", romaji: "mada tabete inai", meaning: "belum makan" },
@@ -938,8 +938,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-25", worldId: "n4", index: 25, chapter: 3,
     title: "Mini-Boss: Laksamana", subtitle: "Mini-Boss: Admiral Kaiyo",
     type: "mini-boss",
-    intro: ["**Menara Pengawas Pelabuhan**", "**Admiral Kaiyo**: «Aku penguasa laut. Lemati ujian tengah!»", "«Semua soal pakai huruf Jepang. Tidak ada romaji. Siap?»"],
-    outro: ["Admiral Kaiyo: «Kau lulus! Setengah jalan lagi!»", "**Stage 25 selesai! +300 XP, Badge: Lulus Ujian Laut**"],
+    intro: ["**Menara Pengawas Pelabuhan**", "**Admiral Kaiyo**: 「Aku penguasa laut. Lemati ujian tengah!」", "「Semua soal pakai huruf Jepang. Tidak ada romaji. Siap?」"],
+    outro: ["Admiral Kaiyo: 「Kau lulus! Setengah jalan lagi!」", "**Stage 25 selesai! +300 XP, Badge: Lulus Ujian Laut**"],
     lesson: undefined,
     enemies: [{ id: "admiral-kaiyo", name: "Admiral Kaiyo", sprite: "????", hp: 100, attack: 14, color: "#01579b", abilities: ["enrage", "shield", "counter", "time-pressure", "crit"] }],
     questions: [
@@ -959,8 +959,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-26", worldId: "n4", index: 26, chapter: 3,
     title: "Kosakata Cuaca", subtitle: "Cuaca & musim",
     type: "battle",
-    intro: ["**Ruang Ujian 4**", "Penguji: «Tema: cuaca & musim. Full Japanese!»"],
-    outro: ["Penguji: «Cuaca terkuasai!»", "**Stage 26 selesai! +230 XP**"],
+    intro: ["**Ruang Ujian 4**", "Penguji: 「Tema: cuaca & musim. Full Japanese!」"],
+    outro: ["Penguji: 「Cuaca terkuasai!」", "**Stage 26 selesai! +230 XP**"],
     lesson: { title: "Kosakata Cuaca", rows: [
       { kana: "??", romaji: "hare", meaning: "cerah" },
       { kana: "??", romaji: "ame", meaning: "hujan" },
@@ -988,8 +988,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-27", worldId: "n4", index: 27, chapter: 3,
     title: "Kosakata Pekerjaan", subtitle: "Pekerjaan & profesi",
     type: "battle",
-    intro: ["**Ruang Ujian 5**", "Penguji: «Tema: pekerjaan. Banyak kanji!»"],
-    outro: ["Penguji: «Pekerjaan terkuasai!»", "**Stage 27 selesai! +250 XP**"],
+    intro: ["**Ruang Ujian 5**", "Penguji: 「Tema: pekerjaan. Banyak kanji!」"],
+    outro: ["Penguji: 「Pekerjaan terkuasai!」", "**Stage 27 selesai! +250 XP**"],
     lesson: { title: "Kosakata Pekerjaan", rows: [
       { kana: "????", romaji: "sensei", meaning: "guru" },
       { kana: "???", romaji: "isha", meaning: "dokter" },
@@ -1014,8 +1014,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-28", worldId: "n4", index: 28, chapter: 3,
     title: "Kosakata Emosi", subtitle: "Perasaan & emosi",
     type: "battle",
-    intro: ["**Ruang Ujian 6**", "Penguji: «Tema: emosi. Ekspresikan perasaanmu dalam bahasa Jepang!»"],
-    outro: ["Penguji: «Emosi terkuasai!»", "**Stage 28 selesai! +270 XP**"],
+    intro: ["**Ruang Ujian 6**", "Penguji: 「Tema: emosi. Ekspresikan perasaanmu dalam bahasa Jepang!」"],
+    outro: ["Penguji: 「Emosi terkuasai!」", "**Stage 28 selesai! +270 XP**"],
     lesson: { title: "Kosakata Emosi", rows: [
       { kana: "????", romaji: "ureshii", meaning: "senang" },
       { kana: "????", romaji: "kanashii", meaning: "sedih" },
@@ -1040,8 +1040,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-29", worldId: "n4", index: 29, chapter: 3,
     title: "Review Menyeluruh", subtitle: "Review semua N4 - full Japanese",
     type: "battle",
-    intro: ["**Ruang Ujian 7 - Pra-Final**", "Penguji: «Review semua! Verba, kanji, kalimat, kosakata. Full Japanese!»"],
-    outro: ["Penguji: «Kau siap ujian akhir!»", "**Stage 29 selesai! +300 XP**"],
+    intro: ["**Ruang Ujian 7 - Pra-Final**", "Penguji: 「Review semua! Verba, kanji, kalimat, kosakata. Full Japanese!」"],
+    outro: ["Penguji: 「Kau siap ujian akhir!」", "**Stage 29 selesai! +300 XP**"],
     lesson: undefined,
     enemies: [{ id: "n4-review", name: "Master Review", sprite: "?", hp: 90, attack: 17, color: "#7c4dff", abilities: ["enrage", "shield", "counter", "crit"] }],
     questions: [
@@ -1061,8 +1061,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-30", worldId: "n4", index: 30, chapter: 3,
     title: "Bos Bab 3: Commodore", subtitle: "Mini-Final Bab 3",
     type: "boss",
-    intro: ["**Aula Komando Pelabuhan**", "**Commodore Umi**: «Ini ujian akhir Bab 3! Lulus, dan kau masuk Bab 4: Ujian Sertifikasi!»"],
-    outro: ["Commodore Umi: «Kau lulus! Bab 4 menunggu!»", "**Bab 3 SELESAI! +500 XP, Badge: Lulus Ujian Pelabuhan**"],
+    intro: ["**Aula Komando Pelabuhan**", "**Commodore Umi**: 「Ini ujian akhir Bab 3! Lulus, dan kau masuk Bab 4: Ujian Sertifikasi!」"],
+    outro: ["Commodore Umi: 「Kau lulus! Bab 4 menunggu!」", "**Bab 3 SELESAI! +500 XP, Badge: Lulus Ujian Pelabuhan**"],
     lesson: undefined,
     enemies: [{ id: "commodore-umi", name: "Commodore Umi", sprite: "??", hp: 130, attack: 18, color: "#01579b", abilities: ["enrage", "heal", "crit", "shield", "multi-attack", "counter"] }],
     questions: [
@@ -1086,8 +1086,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-31", worldId: "n4", index: 31, chapter: 4,
     title: "Sertifikasi Dimulai", subtitle: "Ujian sertifikasi resmi",
     type: "lesson",
-    intro: ["**Gedung Sertifikasi Pelabuhan**", "Penguji sertifikasi: «Ini ujian resmi. 10 stage tersisa. Full Japanese, soal campuran!»"],
-    outro: ["Penguji: «Dimulai!»", "**Stage 31 selesai! +200 XP**"],
+    intro: ["**Gedung Sertifikasi Pelabuhan**", "Penguji sertifikasi: 「Ini ujian resmi. 10 stage tersisa. Full Japanese, soal campuran!」"],
+    outro: ["Penguji: 「Dimulai!」", "**Stage 31 selesai! +200 XP**"],
     lesson: { title: "Kosakata Belanja", rows: [
       { kana: "??", romaji: "mise", meaning: "toko" },
       { kana: "????", romaji: "suupaa", meaning: "supermarket" },
@@ -1111,8 +1111,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-32", worldId: "n4", index: 32, chapter: 4,
     title: "Kosakata Sekolah", subtitle: "Sekolah & pendidikan",
     type: "battle",
-    intro: ["**Ruang Sertifikasi 2**", "Penguji: «Tema: sekolah!»"],
-    outro: ["Penguji: «Sekolah terkuasai!»", "**Stage 32 selesai! +220 XP**"],
+    intro: ["**Ruang Sertifikasi 2**", "Penguji: 「Tema: sekolah!」"],
+    outro: ["Penguji: 「Sekolah terkuasai!」", "**Stage 32 selesai! +220 XP**"],
     lesson: { title: "Kosakata Sekolah", rows: [
       { kana: "????", romaji: "gakkou", meaning: "sekolah" },
       { kana: "?????", romaji: "benkyou", meaning: "belajar" },
@@ -1136,8 +1136,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-33", worldId: "n4", index: 33, chapter: 4,
     title: "Kosakata Kesehatan", subtitle: "Kesehatan & medis",
     type: "battle",
-    intro: ["**Ruang Sertifikasi 3**", "Penguji: «Tema: kesehatan!»"],
-    outro: ["Penguji: «Kesehatan terkuasai!»", "**Stage 33 selesai! +240 XP**"],
+    intro: ["**Ruang Sertifikasi 3**", "Penguji: 「Tema: kesehatan!」"],
+    outro: ["Penguji: 「Kesehatan terkuasai!」", "**Stage 33 selesai! +240 XP**"],
     lesson: { title: "Kosakata Kesehatan", rows: [
       { kana: "????", romaji: "byouki", meaning: "sakit" },
       { kana: "???", romaji: "kusuri", meaning: "obat" },
@@ -1162,8 +1162,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-34", worldId: "n4", index: 34, chapter: 4,
     title: "Kosakata Waktu", subtitle: "Waktu & jam",
     type: "battle",
-    intro: ["**Ruang Sertifikasi 4**", "Penguji: «Tema: waktu & jam!»"],
-    outro: ["Penguji: «Waktu terkuasai!»", "**Stage 34 selesai! +260 XP**"],
+    intro: ["**Ruang Sertifikasi 4**", "Penguji: 「Tema: waktu & jam!」"],
+    outro: ["Penguji: 「Waktu terkuasai!」", "**Stage 34 selesai! +260 XP**"],
     lesson: { title: "Kosakata Waktu", rows: [
       { kana: "??", romaji: "ima", meaning: "sekarang" },
       { kana: "???", romaji: "kinou", meaning: "kemarin" },
@@ -1187,8 +1187,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-35", worldId: "n4", index: 35, chapter: 4,
     title: "Kosakata Hobi", subtitle: "Hobi & kesukaan",
     type: "battle",
-    intro: ["**Ruang Sertifikasi 5**", "Penguji: «Tema: hobi & kesukaan!»"],
-    outro: ["Penguji: «Hobi terkuasai!»", "**Stage 35 selesai! +280 XP**"],
+    intro: ["**Ruang Sertifikasi 5**", "Penguji: 「Tema: hobi & kesukaan!」"],
+    outro: ["Penguji: 「Hobi terkuasai!」", "**Stage 35 selesai! +280 XP**"],
     lesson: { title: "Kosakata Hobi", rows: [
       { kana: "???", romaji: "shumi", meaning: "hobi" },
       { kana: "????", romaji: "ongaku", meaning: "musik" },
@@ -1214,8 +1214,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-36", worldId: "n4", index: 36, chapter: 4,
     title: "Grammar: ~????", subtitle: "Ajakan sopan (~????)",
     type: "battle",
-    intro: ["**Ruang Sertifikasi 6**", "Penguji: «Bentuk ajakan sopan: ~????. Pelajari!»"],
-    outro: ["Penguji: «Ajakan terkuasai!»", "**Stage 36 selesai! +300 XP**"],
+    intro: ["**Ruang Sertifikasi 6**", "Penguji: 「Bentuk ajakan sopan: ~????. Pelajari!」"],
+    outro: ["Penguji: 「Ajakan terkuasai!」", "**Stage 36 selesai! +300 XP**"],
     lesson: { title: "~???? (Ajakan)", rows: [
       { kana: "??????", romaji: "tabemashou", meaning: "mari makan" },
       { kana: "??????", romaji: "ikimashou", meaning: "mari pergi" },
@@ -1237,8 +1237,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-37", worldId: "n4", index: 37, chapter: 4,
     title: "Grammar: ~???", subtitle: "Rencana (~???)",
     type: "battle",
-    intro: ["**Ruang Sertifikasi 7**", "Penguji: «Bentuk rencana: ~???. 'Aku berencana untuk...'»"],
-    outro: ["Penguji: «Rencana terkuasai!»", "**Stage 37 selesai! +320 XP**"],
+    intro: ["**Ruang Sertifikasi 7**", "Penguji: 「Bentuk rencana: ~???. 'Aku berencana untuk...'」"],
+    outro: ["Penguji: 「Rencana terkuasai!」", "**Stage 37 selesai! +320 XP**"],
     lesson: { title: "~??? (Rencana)", rows: [
       { kana: "?? ??? ??", romaji: "iku tsumori desu", meaning: "berencana pergi" },
       { kana: "??? ??? ??", romaji: "taberu tsumori desu", meaning: "berencana makan" },
@@ -1258,8 +1258,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-38", worldId: "n4", index: 38, chapter: 4,
     title: "Grammar: ~?????", subtitle: "Pengalaman (~?????)",
     type: "battle",
-    intro: ["**Ruang Sertifikasi 8**", "Penguji: «Bentuk pengalaman: ~?????. 'Pernah...'»"],
-    outro: ["Penguji: «Pengalaman terkuasai!»", "**Stage 38 selesai! +340 XP**"],
+    intro: ["**Ruang Sertifikasi 8**", "Penguji: 「Bentuk pengalaman: ~?????. 'Pernah...'」"],
+    outro: ["Penguji: 「Pengalaman terkuasai!」", "**Stage 38 selesai! +340 XP**"],
     lesson: { title: "~????? (Pengalaman)", rows: [
       { kana: "??? ??? ????", romaji: "itta koto ga arimasu", meaning: "pernah pergi" },
       { kana: "??? ??? ????", romaji: "tabeta koto ga arimasu", meaning: "pernah makan" },
@@ -1279,8 +1279,8 @@ export const N4_STAGES: Stage[] = [
     id: "n4-39", worldId: "n4", index: 39, chapter: 4,
     title: "Pra-Ujian Akhir", subtitle: "Review akhir - full Japanese",
     type: "battle",
-    intro: ["**Ruang Sertifikasi 9 - Pra-Final**", "Penguji: «Review terakhir! Semua materi N4. Full Japanese!»"],
-    outro: ["Penguji: «Kau siap ujian akhir!»", "**Stage 39 selesai! +380 XP**"],
+    intro: ["**Ruang Sertifikasi 9 - Pra-Final**", "Penguji: 「Review terakhir! Semua materi N4. Full Japanese!」"],
+    outro: ["Penguji: 「Kau siap ujian akhir!」", "**Stage 39 selesai! +380 XP**"],
     lesson: undefined,
     enemies: [{ id: "n4-final-review", name: "Master Final Review", sprite: "?", hp: 130, attack: 24, color: "#7c4dff", abilities: ["enrage", "shield", "counter", "crit", "time-pressure"] }],
     questions: [
@@ -1302,13 +1302,13 @@ export const N4_STAGES: Stage[] = [
     type: "boss",
     intro: [
       "**Gedung Sertifikasi - Aula Utama**",
-      "**Harbor Master Minato** duduk di singgasana. «Pengelana, ini ujian akhir tingkat Madya Bawah!»",
-      "«Semua soal dalam bahasa Jepang penuh. Lulus, dan kau naik ke tingkat Madya - Kage Clan!»",
+      "**Harbor Master Minato** duduk di singgasana. 「Pengelana, ini ujian akhir tingkat Madya Bawah!」",
+      "「Semua soal dalam bahasa Jepang penuh. Lulus, dan kau naik ke tingkat Madya - Kage Clan!」",
       "**UJIAN AKHIR TINGKAT MADYA BAWAH DIMULAI**",
     ],
     outro: [
-      "Harbor Master: «Kau lulus sempurna! Gelar «Sarjana Madya Bawah» adalah milikmu!»",
-      "Ia menyerahkan sertifikat emas. «Lanjut ke Kage Clan - tingkat Madya menunggu!»",
+      "Harbor Master: 「Kau lulus sempurna! Gelar 「Sarjana Madya Bawah」 adalah milikmu!」",
+      "Ia menyerahkan sertifikat emas. 「Lanjut ke Kage Clan - tingkat Madya menunggu!」",
       "**UJIAN AKHIR MADYA BAWAH SELESAI! +1200 XP, 800 koin, Badge: Sarjana Madya Bawah, Item: Sertifikat Minato**",
       "**Dunia baru terbuka: Kage Clan (Tingkat Madya)**",
     ],

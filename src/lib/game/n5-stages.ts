@@ -25,7 +25,7 @@ export const N5_STAGES: Stage[] = [
     ],
     outro: [
       "Penjaga tersenyum. 「おはようございます! Silakan masuk. Semoga harimu menyenangkan!」",
-      "Yuki: «Sekarang kau bisa menyapa siapa saja! Tapi pasar sedang kacau...」",
+      "Yuki: 「Sekarang kau bisa menyapa siapa saja! Tapi pasar sedang kacau...」",
       "**Stage 1 selesai! +70 XP, 25 koin**",
     ],
     lesson: {
@@ -40,7 +40,7 @@ export const N5_STAGES: Stage[] = [
         { kana: "すみません", romaji: "sumimasen", meaning: "maaf / permisi" },
         { kana: "はじめまして", romaji: "hajimemashite", meaning: "senang berkenalan" },
       ],
-      note: "Formal: tambah 'gozaimasu' (ございます). 'sumimasen' bisa berarti 'maaf' ATAU 'permisi' ATAU 'minta perhatian'.",
+      note: "💡 PENJELASAN: 'ohayou' = pagi (santai, untuk teman). 'ohayou gozaimasu' = pagi (sopan, untuk orang tua/atasan). 'konnichiwa' = halo (siang-sore). 'sumimasen' = maaf ATAU permisi ATAU minta perhatian (1 kata banyak arti!). 'arigatou' = terima kasih (tambah 'gozaimasu' untuk sopan).",
     },
     enemies: [
       {
@@ -109,7 +109,7 @@ export const N5_STAGES: Stage[] = [
     ],
     outro: [
       "Anak itu tersenyum. 「わたしは トモ です! Nama saya Tomo! Terima kasih, pengelana!」",
-      "Yuki: «Bagus! Sekarang kau bisa memperkenalkan diri.»",
+      "Yuki: 「Bagus! Sekarang kau bisa memperkenalkan diri.」",
       "**Stage 2 selesai! +80 XP, 30 koin**",
     ],
     lesson: {
@@ -191,7 +191,7 @@ export const N5_STAGES: Stage[] = [
     ],
     outro: [
       "Toko roti kembali normal. Penjual: 「これは ケーキ です!」",
-      "Yuki: «Sekarang kau bisa membuat kalimat sederhana!»",
+      "Yuki: 「Sekarang kau bisa membuat kalimat sederhana!」",
       "**Stage 3 selesai! +90 XP, 35 koin**",
     ],
     lesson: {
@@ -267,12 +267,12 @@ export const N5_STAGES: Stage[] = [
     intro: [
       "**Pasar Vassal - Sibuk**",
       "Pasar sedang kacau! Pedagang tidak bisa menyebut harga.",
-      "「これ... いくら?」 (Ini berapa?) «Saya lupa angka!»",
+      "「これ... いくら?」 (Ini berapa?) 「Saya lupa angka!」",
       "Yuki: 「Belajar 1-10 dulu. Penting untuk transaksi!」",
     ],
     outro: [
       "Pasar kembali ramai. Pedagang berseru: 「これ は さんびゃくえん です! 300 yen!」",
-      "Yuki: «Bagus! Sekarang bisa bertransaksi.»",
+      "Yuki: 「Bagus! Sekarang bisa bertransaksi.」",
       "**Stage 4 selesai! +100 XP, 40 koin**",
     ],
     lesson: {
@@ -361,8 +361,8 @@ export const N5_STAGES: Stage[] = [
       "Yuki: 「Hari dalam seminggu pakai 'youbi'. Bulan pakai 'gatsu'. Pelajari baik-baik!」",
     ],
     outro: [
-      "Tokkun tertawa puas. 「Kau tahu waktuku! Silakan lanjut ke kastil dalam.»",
-      "Ia memberimu kunci kecil. «Ini kunci menuju perpustakaan kerajaan.»",
+      "Tokkun tertawa puas. 「Kau tahu waktuku! Silakan lanjut ke kastil dalam.」",
+      "Ia memberimu kunci kecil. 「Ini kunci menuju perpustakaan kerajaan.」",
       "**Stage 5 selesai! +150 XP, 50 koin, Item: Kunci Perpustakaan, Badge: Lulus Ujian Waktu**",
     ],
     lesson: {
@@ -458,8 +458,8 @@ export const N5_STAGES: Stage[] = [
       "Yuki: 「Kanji angka paling dasar. Bentuknya sederhana - belajar dulu 1-10.」",
     ],
     outro: [
-      "Pustakawan tersenyum. 「Kau cepat belajar! Tapi Kanji banyak sekali - di N5 sekitar 100.»",
-      "Ia memberimu kamus Kanji. «Ini akan membantumu mengenali kanji dasar.»",
+      "Pustakawan tersenyum. 「Kau cepat belajar! Tapi Kanji banyak sekali - di N5 sekitar 100.」",
+      "Ia memberimu kamus Kanji. 「Ini akan membantumu mengenali kanji dasar.」",
       "**Stage 6 selesai! +110 XP, 45 koin, Item: Kamus Kanji Dasar**",
     ],
     lesson: {
@@ -548,12 +548,12 @@ export const N5_STAGES: Stage[] = [
     intro: [
       "**Lorong Perpustakaan**",
       "Buku-buku berkilau di rak. Satu buku melayang: 「Pelajari kami, pemuda!」",
-      "「Kanji dasar yang sering muncul: 人 (orang), 日 (hari/matahari), 月 (bulan), « (api), 水 (air).」",
-      "Yuki: 「Ini kanji yang dipakai dalam nama hari! getsuyoubi = 月 + youbi.»",
+      "「Kanji dasar yang sering muncul: 人 (orang), 日 (hari/matahari), 月 (bulan), 「 (api), 水 (air).」",
+      "Yuki: 「Ini kanji yang dipakai dalam nama hari! getsuyoubi = 月 + youbi.」",
     ],
     outro: [
-      "Buku-buku di rak berdenting senang. 「Kau mengenal kami sekarang!»",
-      "Yuki: «Bagus! Sekarang kau bisa membaca tanda-tanda dasar di kerajaan.»",
+      "Buku-buku di rak berdenting senang. 「Kau mengenal kami sekarang!」",
+      "Yuki: 「Bagus! Sekarang kau bisa membaca tanda-tanda dasar di kerajaan.」",
       "**Stage 7 selesai! +120 XP, 50 koin**",
     ],
     lesson: {
@@ -562,13 +562,13 @@ export const N5_STAGES: Stage[] = [
         { kana: "人", romaji: "hito/nin", meaning: "orang" },
         { kana: "日", romaji: "hi/nichi", meaning: "hari/matahari" },
         { kana: "月", romaji: "tsuki/getsu", meaning: "bulan/bulan(kalender)" },
-        { kana: "«", romaji: "hi/ka", meaning: "api" },
+        { kana: "火", romaji: "hi/ka", meaning: "api" },
         { kana: "水", romaji: "mizu/sui", meaning: "air" },
         { kana: "木", romaji: "ki/moku", meaning: "pohon/kayu" },
         { kana: "金", romaji: "kin/kane", meaning: "emas/uang" },
         { kana: "本", romaji: "hon", meaning: "asal/buku" },
       ],
-      note: "Hari dalam seminggu pakai kanji ini! 月(getsu=Senin), «(ka=Selasa), 水(sui=Rabu), 木(moku=Kamis), 金(kin=Jumat), 土(do=Sabtu), 日(nichi=Minggu).",
+      note: "Hari dalam seminggu pakai kanji ini! 月(getsu=Senin), 「(ka=Selasa), 水(sui=Rabu), 木(moku=Kamis), 金(kin=Jumat), 土(do=Sabtu), 日(nichi=Minggu).",
     },
     enemies: [
       {
@@ -614,7 +614,7 @@ export const N5_STAGES: Stage[] = [
         type: "choice",
         prompt: "Hari Senin 'げつようび' pakai kanji?",
         kana: "げつようび",
-        options: ["日", "月", "«", "木"],
+        options: ["日", "月", "「", "木"],
         answer: 1,
         hint: "getsu = bulan",
       },
@@ -641,11 +641,11 @@ export const N5_STAGES: Stage[] = [
       "**Halaman Kastil Dalam**",
       "Kau tiba di kastil dalam. Para penjaga sedang latihan pedang.",
       "Komandan: 「たべます! (makan!) のみます! (minum!) いきます! (pergi!)」",
-      "「Pelajari bentuk ます (masu) - bentuk sopan kata kerja. Ini dasar semua kalimat kerja!»",
-      "Yuki: 「ます (masu) = bentuk sopan positif. ません (masen) = bentuk sopan negatif.»",
+      "「Pelajari bentuk ます (masu) - bentuk sopan kata kerja. Ini dasar semua kalimat kerja!」",
+      "Yuki: 「ます (masu) = bentuk sopan positif. ません (masen) = bentuk sopan negatif.」",
     ],
     outro: [
-      "Komandan mengangguk. 「Kau paham kata kerja! Sekarang bisa menyuruh dan menyatakan aksi.»",
+      "Komandan mengangguk. 「Kau paham kata kerja! Sekarang bisa menyuruh dan menyatakan aksi.」",
       "**Stage 8 selesai! +130 XP, 55 koin**",
     ],
     lesson: {
@@ -732,12 +732,12 @@ export const N5_STAGES: Stage[] = [
     intro: [
       "**Taman Kastil Vassal**",
       "Di taman yang indah, kau bertemu seorang pelayan yang bingung.",
-      "「Bunga ini... あかい? たかい? きれい? Saya bingung kata sifat mana yang dipakai!»",
-      "Yuki: 「Ada dua jenis kata sifat: -i (いい、たかい) dan -na (きれいな、しずかな). Pelajari!»",
+      "「Bunga ini... あかい? たかい? きれい? Saya bingung kata sifat mana yang dipakai!」",
+      "Yuki: 「Ada dua jenis kata sifat: -i (いい、たかい) dan -na (きれいな、しずかな). Pelajari!」",
     ],
     outro: [
       "Pelayan tersenyum. 「Bunga ini きれいですね! Cantik ya!」",
-      "Yuki: «Sekarang kau bisa mendeskripsikan apapun!»",
+      "Yuki: 「Sekarang kau bisa mendeskripsikan apapun!」",
       "**Stage 9 selesai! +140 XP, 60 koin**",
     ],
     lesson: {
@@ -752,14 +752,14 @@ export const N5_STAGES: Stage[] = [
         { kana: "しずか(な)", romaji: "shizuka (na)", meaning: "tenang (-na)" },
         { kana: "げんき(な)", romaji: "genki (na)", meaning: "sehat / energetik (-na)" },
       ],
-      note: "Sifat -i: berakhiran い, langsung pakai (たかい + です). Sifat -na: pakai 'na' sebelum kata benda (きれいな »ん).",
+      note: "Sifat -i: berakhiran い, langsung pakai (たかい + です). Sifat -na: pakai 'na' sebelum kata benda (きれいな 」ん).",
     },
     enemies: [
       {
         id: "adjective-mist",
         name: "Kabut Sifat",
         nameJp: "形容詞",
-        sprite: "«",
+        sprite: "「",
         hp: 30,
         attack: 8,
         color: "#cfd8dc",
@@ -790,7 +790,7 @@ export const N5_STAGES: Stage[] = [
       {
         type: "choice",
         prompt: "Untuk mendeskripsikan buku yang cantik, kau bilang?",
-        options: ["きれい »ん", "きれいな »ん", "きれいの »ん", "きれいい »ん"],
+        options: ["きれい 」ん", "きれいな 」ん", "きれいの 」ん", "きれいい 」ん"],
         answer: 1,
         hint: "Sifat -na + na + kata benda",
       },
@@ -817,15 +817,15 @@ export const N5_STAGES: Stage[] = [
       "**Tahta Kastil Vassal**",
       "Di aula tahta, sesosok pria berjanggut putih duduk di singgasana. **Lord Vassal**, penguasa kerajaan.",
       "「Pengelana dari Hajimari... Aku dengar kau membantu pendudukku. Tapi untuk kuasai kerajaanku, kau harus menguasaiku dulu dalam bahasa!」",
-      "Yuki: «Ini ujian akhir N5. Gabungkan semua yang kau pelajari - salam, kata ganti, desu, angka, hari, kanji, kata kerja, sifat!»",
+      "Yuki: 「Ini ujian akhir N5. Gabungkan semua yang kau pelajari - salam, kata ganti, desu, angka, hari, kanji, kata kerja, sifat!」",
       "Lord Vassal berdiri. 「Pertarungan bahasa dimulai!」",
       "**PERTARUNGAN AKHIR BAB N5**",
     ],
     outro: [
-      "Lord Vassal tertawa lebar. 「HAHAHA! Kau menguasai dasar bahasa Jepang!»",
-      "Ia menjabat tanganmu. 「Selamat, pahlawan. Kau pantas mendapat gelar «Pengelana Dasar».»",
-      "Ia menyerahkan medali emas. «Dengan ini, kau lanjut ke Bab 2: Ujian Akademi!»",
-      "Yuki: «Aku bangga padamu. Sekarang waktunya ujian resmi di Akademi!»",
+      "Lord Vassal tertawa lebar. 「HAHAHA! Kau menguasai dasar bahasa Jepang!」",
+      "Ia menjabat tanganmu. 「Selamat, pahlawan. Kau pantas mendapat gelar 「Pengelana Dasar」.」",
+      "Ia menyerahkan medali emas. 「Dengan ini, kau lanjut ke Bab 2: Ujian Akademi!」",
+      "Yuki: 「Aku bangga padamu. Sekarang waktunya ujian resmi di Akademi!」",
       "**BAB 1 SELESAI! +800 XP, 300 koin, Badge: Pengelana Dasar, Item: Medali Vassal**",
       "**Bab 2 terbuka: Ujian Akademi (Stage 11-20)**",
     ],
@@ -847,7 +847,7 @@ export const N5_STAGES: Stage[] = [
       {
         id: "lord-vassal",
         name: "Lord Vassal",
-        nameJp: "ヴァッサ«卿",
+        nameJp: "ヴァッサ「卿",
         sprite: "🤴",
         hp: 108,
         attack: 15,
@@ -874,8 +874,8 @@ export const N5_STAGES: Stage[] = [
       },
       {
         type: "choice",
-        prompt: "「これは »ん です」 artinya?",
-        kana: "これは »ん です",
+        prompt: "「これは 」ん です」 artinya?",
+        kana: "これは ほん です",
         options: ["Ini adalah buku", "Itu adalah buku", "Aku adalah buku", "Buku adalah ini"],
         answer: 0,
       },
@@ -920,7 +920,7 @@ export const N5_STAGES: Stage[] = [
       },
       {
         type: "choice",
-        prompt: "「Selamat tinggal» dalam bahasa Jepang?",
+        prompt: "「Selamat tinggal」 dalam bahasa Jepang?",
         options: ["こんにちは", "ありがとう", "さようなら", "すみません"],
         answer: 2,
       },
@@ -944,7 +944,7 @@ export const N5_STAGES: Stage[] = [
       "「Jangan khawatir, pelan-pelan. Kita mulai dari yang mudah.」",
     ],
     outro: [
-      "Penguji: «Bagus! Kau mulai terbiasa dengan kana di opsi. Lanjut!»",
+      "Penguji: 「Bagus! Kau mulai terbiasa dengan kana di opsi. Lanjut!」",
       "**Stage 11 selesai! +120 XP**",
     ],
     lesson: {
@@ -964,7 +964,7 @@ export const N5_STAGES: Stage[] = [
     questions: [
       { type: "choice", prompt: "「わたし」の いみは?", kana: "わたし", options: ["saya", "kamu", "teman", "guru"], answer: 0, hint: "kata ganti orang pertama" },
       { type: "choice", prompt: "Apa arti がっこう?", kana: "がっこう", options: ["sekolah", "rumah", "toko", "kuil"], answer: 0 },
-      { type: "choice", prompt: "「sensei」を «»んごで:", options: ["せんせい", "がっこう", "ともだち", "わたし"], answer: 0, hint: "guru dalam bahasa Jepang" },
+      { type: "choice", prompt: "「sensei」を 「」んごで:", options: ["せんせい", "がっこう", "ともだち", "わたし"], answer: 0, hint: "guru dalam bahasa Jepang" },
       { type: "choice", prompt: "Teman = ?", options: ["ともだち", "せんせい", "わたし", "あなた"], answer: 0 },
       { type: "typing", prompt: "Ketik romaji untuk がっこう:", kana: "がっこう", answer: ["gakkou", "gakko"] },
       { type: "choice", prompt: "あなたの いみは?", kana: "あなた", options: ["kamu", "saya", "dia", "kami"], answer: 0 },
@@ -986,7 +986,7 @@ export const N5_STAGES: Stage[] = [
       "Penguji: 「Sekarang semua opsi pakai ひらがな. Tidak ada romaji lagi.」",
       "「Kau harus bisa membaca huruf Jepang untuk menjawab. Fokus!」",
     ],
-    outro: ["Penguji: «Kau bisa baca kana tanpa romaji! Lanjut ke kanji!»", "**Stage 12 selesai! +140 XP**"],
+    outro: ["Penguji: 「Kau bisa baca kana tanpa romaji! Lanjut ke kanji!」", "**Stage 12 selesai! +140 XP**"],
     lesson: {
       title: "Kosakata Sehari-hari (Kana)",
       rows: [
@@ -1005,10 +1005,10 @@ export const N5_STAGES: Stage[] = [
     questions: [
       { type: "choice", prompt: "「みず」の いみは?", kana: "みず", options: ["みず", "たべもの", "よる", "あさ"], answer: 0, hint: "yang diminum" },
       { type: "choice", prompt: "Apa arti たべもの?", kana: "たべもの", options: ["みず", "たべもの", "のむ", "よる"], answer: 1, hint: "yang dimakan" },
-      { type: "choice", prompt: "「malam」は «»んごで?", options: ["あさ", "ひる", "よる", "みず"], answer: 2 },
+      { type: "choice", prompt: "「malam」は 「」んごで?", options: ["あさ", "ひる", "よる", "みず"], answer: 2 },
       { type: "choice", prompt: "「siang」は?", options: ["あさ", "ひる", "よる", "みず"], answer: 1 },
       { type: "typing", prompt: "ロマジで かいて (ketik romaji): のみもの", kana: "のみもの", answer: ["nomimono"] },
-      { type: "choice", prompt: "「pagi」は «»んごで?", options: ["あさ", "ひる", "よる", "みず"], answer: 0 },
+      { type: "choice", prompt: "「pagi」は 「」んごで?", options: ["あさ", "ひる", "よる", "みず"], answer: 0 },
     ],
     reward: { xp: 140 },
   },
@@ -1027,16 +1027,16 @@ export const N5_STAGES: Stage[] = [
       "Penguji: 「Sekarang kanji mulai muncul. Tapi jangan takut - itu kanji yang sudah kau pelajari!」",
       "「人, 日, 月, 火, 水, 木, 金 - semua ini sudah kau kenal.」",
     ],
-    outro: ["Penguji: «Kanji pertama berhasil! Lanjut ke tingkat lebih sulit!»", "**Stage 13 selesai! +160 XP**"],
+    outro: ["Penguji: 「Kanji pertama berhasil! Lanjut ke tingkat lebih sulit!」", "**Stage 13 selesai! +160 XP**"],
     lesson: undefined,
     enemies: [
       { id: "kanji-tester", name: "Penguji Kanji", sprite: "🔤", hp: 40, attack: 9, color: "#e91e63", abilities: ["enrage", "crit"] },
     ],
     questions: [
-      { type: "choice", prompt: "「人」の よみかたは?", kana: "人", options: ["ひと", "ひ", "«ち", "つき"], answer: 0, hint: "orang" },
+      { type: "choice", prompt: "「人」の よみかたは?", kana: "人", options: ["ひと", "ひ", "「ち", "つき"], answer: 0, hint: "orang" },
       { type: "choice", prompt: "「日」の いみは?", kana: "日", options: ["hari/matahari", "bulan", "api", "air"], answer: 0 },
       { type: "choice", prompt: "「月」の いみは?", kana: "月", options: ["hari", "bulan", "tahun", "jam"], answer: 1 },
-      { type: "choice", prompt: "「«」の いみは?", kana: "«", options: ["air", "tanah", "api", "angin"], answer: 2 },
+      { type: "choice", prompt: "「火」の いみは?", kana: "火", options: ["air", "tanah", "api", "angin"], answer: 2 },
       { type: "choice", prompt: "「水」の いみは?", kana: "水", options: ["みず", "ひ", "つき", "ひと"], answer: 0, hint: "air" },
       { type: "typing", prompt: "ロマジで: 人 (orang)", kana: "人", answer: ["hito", "nin"] },
     ],
@@ -1057,14 +1057,14 @@ export const N5_STAGES: Stage[] = [
       "Penguji: 「Sekarang kalimat! Bukan cuma kata tunggal.」",
       "「わたしは がくせい です - kalimat seperti ini. Pahami artinya!」",
     ],
-    outro: ["Penguji: «Kau bisa baca kalimat! Hebat!»", "**Stage 14 selesai! +180 XP**"],
+    outro: ["Penguji: 「Kau bisa baca kalimat! Hebat!」", "**Stage 14 selesai! +180 XP**"],
     lesson: {
       title: "Kalimat Dasar",
       rows: [
         { kana: "わたしは がくせい です", romaji: "watashi wa gakusei desu", meaning: "saya adalah murid" },
-        { kana: "これは »ん です", romaji: "kore wa hon desu", meaning: "ini adalah buku" },
+        { kana: "これは ほん です", romaji: "kore wa hon desu", meaning: "ini adalah buku" },
         { kana: "それは えんぴつ です", romaji: "sore wa enpitsu desu", meaning: "itu adalah pensil" },
-        { kana: "あそこ« がっこう が あります", romaji: "asoko ni gakkou ga arimasu", meaning: "di sana ada sekolah" },
+        { kana: "あそこに がっこう が あります", romaji: "asoko ni gakkou ga arimasu", meaning: "di sana ada sekolah" },
       ],
       note: "Kalimat dasar: A は B です (A adalah B). これ = ini, それ = itu (dekat lawan), あれ = itu (jauh).",
     },
@@ -1073,10 +1073,10 @@ export const N5_STAGES: Stage[] = [
     ],
     questions: [
       { type: "choice", prompt: "「わたしは がくせい です」の いみは?", kana: "わたしは がくせい です", options: ["saya murid", "kamu guru", "dia teman", "ini buku"], answer: 0 },
-      { type: "choice", prompt: "「これは »ん です」の いみは?", kana: "これは »ん です", options: ["ini buku", "itu pensil", "saya murid", "ada sekolah"], answer: 0 },
+      { type: "choice", prompt: "「これは 」ん です」の いみは?", kana: "これは ほん です", options: ["ini buku", "itu pensil", "saya murid", "ada sekolah"], answer: 0 },
       { type: "choice", prompt: "「それ」の いみは?", kana: "それ", options: ["ini (dekat saya)", "itu (dekat lawan)", "itu (jauh)", "mana"], answer: 1 },
-      { type: "choice", prompt: "「あそこ« がっこう が あります」 artinya?", kana: "あそこ« がっこう が あります", options: ["di sana ada sekolah", "di sini ada buku", "saya ke sekolah", "sekolah jauh"], answer: 0 },
-      { type: "typing", prompt: "ロマジで: これは »ん です", kana: "これは »ん です", answer: ["kore wa hon desu"] },
+      { type: "choice", prompt: "「あそこ「 がっこう が あります」 artinya?", kana: "あそこに がっこう が あります", options: ["di sana ada sekolah", "di sini ada buku", "saya ke sekolah", "sekolah jauh"], answer: 0 },
+      { type: "typing", prompt: "ロマジで: これは 」ん です", kana: "これは ほん です", answer: ["kore wa hon desu"] },
     ],
     reward: { xp: 180 },
   },
@@ -1096,7 +1096,7 @@ export const N5_STAGES: Stage[] = [
       "「Semua soal pakai huruf Jepang. Tidak ada romaji. Siap?」",
     ],
     outro: [
-      "Professor Vassal: «Kau lulus ujian tengah! Setengah jalan lagi!»",
+      "Professor Vassal: 「Kau lulus ujian tengah! Setengah jalan lagi!」",
       "**Stage 15 selesai! +250 XP, Badge: Lulus Ujian Tengah**",
     ],
     lesson: undefined,
@@ -1105,11 +1105,11 @@ export const N5_STAGES: Stage[] = [
     ],
     questions: [
       { type: "choice", prompt: "「わたし」の いみは?", kana: "わたし", options: ["saya", "kamu", "dia", "kami"], answer: 0 },
-      { type: "choice", prompt: "「ひと」を かんじで:", options: ["人", "日", "月", "«"], answer: 0 },
+      { type: "choice", prompt: "「ひと」を かんじで:", options: ["人", "日", "月", "「"], answer: 0 },
       { type: "choice", prompt: "「わたしは がくせい です」の いみは?", kana: "わたしは がくせい です", options: ["saya murid", "kamu guru", "ini buku", "dia teman"], answer: 0 },
       { type: "choice", prompt: "「みず」の いみは?", kana: "みず", options: ["みず", "ひ", "つき", "ひと"], answer: 0 },
       { type: "typing", prompt: "ロマジで: たべもの", kana: "たべもの", answer: ["tabemono"] },
-      { type: "choice", prompt: "「日」の よみかたは? (bacaan)", kana: "日", options: ["ひ/«ち", "つき", "ひと", "みず"], answer: 0 },
+      { type: "choice", prompt: "「日」の よみかたは? (bacaan)", kana: "日", options: ["ひ/「ち", "つき", "ひと", "みず"], answer: 0 },
       { type: "choice", prompt: "「それ」の いみは?", kana: "それ", options: ["itu (dekat lawan)", "ini", "itu (jauh)", "mana"], answer: 0 },
       { type: "typing", prompt: "ロマジで: よる (malam)", kana: "よる", answer: ["yoru"] },
     ],
@@ -1129,7 +1129,7 @@ export const N5_STAGES: Stage[] = [
       "**Ruang Ujian 4**",
       "Penguji: 「Tema: rumah & kehidupan sehari-hari. Semua dalam bahasa Jepang!」",
     ],
-    outro: ["Penguji: «Kosakata rumah terkuasai!»", "**Stage 16 selesai! +200 XP**"],
+    outro: ["Penguji: 「Kosakata rumah terkuasai!」", "**Stage 16 selesai! +200 XP**"],
     lesson: {
       title: "Kosakata Rumah",
       rows: [
@@ -1138,19 +1138,19 @@ export const N5_STAGES: Stage[] = [
         { kana: "ドア", romaji: "doa", meaning: "pintu" },
         { kana: "まど", romaji: "mado", meaning: "jendela" },
         { kana: "ベッド", romaji: "beddo", meaning: "kasur" },
-        { kana: "テーブ«", romaji: "teeburu", meaning: "meja" },
+        { kana: "テーブル", romaji: "teeburu", meaning: "meja" },
       ],
-      note: "Kata serapan pakai Katakana: ドア (doa), ベッド (beddo), テーブ« (teeburu).",
+      note: "Kata serapan pakai Katakana: ドア (doa), ベッド (beddo), テーブ「 (teeburu).",
     },
     enemies: [
       { id: "home-ghost", name: "Hantu Rumah", sprite: "🏠", hp: 50, attack: 11, color: "#795548", abilities: ["regen", "shield"] },
     ],
     questions: [
       { type: "choice", prompt: "「いえ」の いみは?", kana: "いえ", options: ["いえ", "へや", "まど", "ドア"], answer: 0, hint: "tempat tinggal" },
-      { type: "choice", prompt: "「jendela」は «»んごで?", options: ["まど", "ドア", "ベッド", "へや"], answer: 0 },
+      { type: "choice", prompt: "「jendela」は 「」んごで?", options: ["まど", "ドア", "ベッド", "へや"], answer: 0 },
       { type: "choice", prompt: "「ベッド」の いみは?", kana: "ベッド", options: ["kasur", "meja", "pintu", "jendela"], answer: 0 },
       { type: "typing", prompt: "ロマジで: へや (kamar)", kana: "へや", answer: ["heya"] },
-      { type: "choice", prompt: "「テーブ«」は な«?", kana: "テーブ«", options: ["meja", "kursi", "pintu", "jendela"], answer: 0 },
+      { type: "choice", prompt: "「テーブ「」は な「?", kana: "テーブル", options: ["meja", "kursi", "pintu", "jendela"], answer: 0 },
       { type: "typing", prompt: "ロマジで: まど", kana: "まど", answer: ["mado"] },
     ],
     reward: { xp: 200 },
@@ -1167,21 +1167,21 @@ export const N5_STAGES: Stage[] = [
     type: "battle",
     intro: [
       "**Ruang Ujian 5**",
-      "Penguji: 「Tema: makanan. Semua dalam ひらがな と «タ«ナ!」",
+      "Penguji: 「Tema: makanan. Semua dalam ひらがな と 「タ「ナ!」",
     ],
-    outro: ["Penguji: «Lapar juga bisa belajar!»", "**Stage 17 selesai! +220 XP**"],
+    outro: ["Penguji: 「Lapar juga bisa belajar!」", "**Stage 17 selesai! +220 XP**"],
     lesson: {
       title: "Kosakata Makanan",
       rows: [
         { kana: "ごはん", romaji: "gohan", meaning: "nasi/makan" },
         { kana: "パン", romaji: "pan", meaning: "roti" },
-        { kana: "«く", romaji: "niku", meaning: "daging" },
+        { kana: "肉", romaji: "niku", meaning: "daging" },
         { kana: "やさい", romaji: "yasai", meaning: "sayuran" },
         { kana: "くだもの", romaji: "kudamono", meaning: "buah" },
         { kana: "コーヒー", romaji: "koohii", meaning: "kopi" },
         { kana: "おちゃ", romaji: "ocha", meaning: "teh" },
       ],
-      note: "Kata serapan: パン (pan=roti), コーヒー (kopi). Kata asli: ごはん (nasi), «く (daging).",
+      note: "Kata serapan: パン (pan=roti), コーヒー (kopi). Kata asli: ごはん (nasi), 「く (daging).",
     },
     enemies: [
       { id: "food-critic", name: "Kritikus Kuliner", sprite: "🍣", hp: 55, attack: 12, color: "#ff5722", abilities: ["poison", "crit"] },
@@ -1189,7 +1189,7 @@ export const N5_STAGES: Stage[] = [
     questions: [
       { type: "choice", prompt: "「ごはん」の いみは?", kana: "ごはん", options: ["nasi/makan", "roti", "daging", "sayur"], answer: 0 },
       { type: "choice", prompt: "「パン」の いみは?", kana: "パン", options: ["roti", "nasi", "teh", "kopi"], answer: 0 },
-      { type: "choice", prompt: "「buah」は «»んごで?", options: ["くだもの", "やさい", "«く", "パン"], answer: 0 },
+      { type: "choice", prompt: "「buah」は 「」んごで?", options: ["くだもの", "やさい", "「く", "パン"], answer: 0 },
       { type: "choice", prompt: "「コーヒー」の いみは?", kana: "コーヒー", options: ["kopi", "teh", "susu", "jus"], answer: 0 },
       { type: "typing", prompt: "ロマジで: おちゃ (teh)", kana: "おちゃ", answer: ["ocha"] },
       { type: "choice", prompt: "「やさい」の いみは?", kana: "やさい", options: ["sayuran", "buah", "daging", "nasi"], answer: 0 },
@@ -1210,7 +1210,7 @@ export const N5_STAGES: Stage[] = [
       "**Ruang Ujian 6**",
       "Penguji: 「Tema: transportasi. Banyak kata serapan pakai Katakana!」",
     ],
-    outro: ["Penguji: «Sekarang kau bisa navigasi kota!»", "**Stage 18 selesai! +240 XP**"],
+    outro: ["Penguji: 「Sekarang kau bisa navigasi kota!」", "**Stage 18 selesai! +240 XP**"],
     lesson: {
       title: "Kosakata Transportasi",
       rows: [
@@ -1230,7 +1230,7 @@ export const N5_STAGES: Stage[] = [
     questions: [
       { type: "choice", prompt: "「でんしゃ」の いみは?", kana: "でんしゃ", options: ["kereta", "bus", "taksi", "mobil"], answer: 0 },
       { type: "choice", prompt: "「バス」の いみは?", kana: "バス", options: ["bus", "kereta", "mobil", "taksi"], answer: 0 },
-      { type: "choice", prompt: "「kanan」は «»んごで?", options: ["みぎ", "ひだり", "まっすぐ", "くるま"], answer: 0 },
+      { type: "choice", prompt: "「kanan」は 「」んごで?", options: ["みぎ", "ひだり", "まっすぐ", "くるま"], answer: 0 },
       { type: "choice", prompt: "「ひだり」の いみは?", kana: "ひだり", options: ["kiri", "kanan", "lurus", "mundur"], answer: 0 },
       { type: "typing", prompt: "ロマジで: まっすぐ (lurus)", kana: "まっすぐ", answer: ["massugu", "massugu"] },
       { type: "choice", prompt: "「タクシー」の いみは?", kana: "タクシー", options: ["taksi", "bus", "kereta", "mobil"], answer: 0 },
@@ -1252,14 +1252,14 @@ export const N5_STAGES: Stage[] = [
       "Penguji: 「Ini review semua materi. Soal campuran: kana, kanji, kalimat, kosakata. Semua dalam bahasa Jepang!」",
       "「Lulus ini, dan kau siap ujian akhir！」",
     ],
-    outro: ["Penguji: «Kau siap! Ujian akhir menunggu!»", "**Stage 19 selesai! +280 XP**"],
+    outro: ["Penguji: 「Kau siap! Ujian akhir menunggu!」", "**Stage 19 selesai! +280 XP**"],
     lesson: undefined,
     enemies: [
       { id: "review-master", name: "Master Review", sprite: "📚", hp: 70, attack: 14, color: "#7c4dff", abilities: ["enrage", "shield", "counter", "crit"] },
     ],
     questions: [
       { type: "choice", prompt: "「わたし」の いみは?", kana: "わたし", options: ["saya", "kamu", "dia", "teman"], answer: 0 },
-      { type: "choice", prompt: "「ひと」を かんじで:", options: ["人", "日", "月", "«"], answer: 0 },
+      { type: "choice", prompt: "「ひと」を かんじで:", options: ["人", "日", "月", "「"], answer: 0 },
       { type: "choice", prompt: "「ごはん」の いみは?", kana: "ごはん", options: ["nasi/makan", "roti", "air", "sayur"], answer: 0 },
       { type: "choice", prompt: "「でんしゃ」の いみは?", kana: "でんしゃ", options: ["kereta", "bus", "mobil", "taksi"], answer: 0 },
       { type: "choice", prompt: "「みぎ」の いみは?", kana: "みぎ", options: ["kanan", "kiri", "lurus", "mundur"], answer: 0 },
@@ -1287,8 +1287,8 @@ export const N5_STAGES: Stage[] = [
       "**UJIAN AKHIR TINGKAT DASAR DIMULAI**",
     ],
     outro: [
-      "Chancellor Vassal: «Kau lulus dengan sempurna! Gelar «Sarjana Dasar» adalah milikmu!»",
-      "Ia menyerahkan sertifikat emas. «Lanjut ke Minato Port - tingkat Madya Bawah menunggu!»",
+      "Chancellor Vassal: 「Kau lulus dengan sempurna! Gelar 「Sarjana Dasar」 adalah milikmu!」",
+      "Ia menyerahkan sertifikat emas. 「Lanjut ke Minato Port - tingkat Madya Bawah menunggu!」",
       "**UJIAN AKHIR DASAR SELESAI! +1000 XP, 500 koin, Badge: Sarjana Dasar, Item: Sertifikat Vassal**",
       "**Bab 2 terbuka: Ujian Akademi (Stage 11-20)**",
     ],
@@ -1299,14 +1299,14 @@ export const N5_STAGES: Stage[] = [
     questions: [
       // Full Japanese exam - comprehensive
       { type: "choice", prompt: "「わたし」の いみは?", kana: "わたし", options: ["saya", "kamu", "dia", "kami"], answer: 0 },
-      { type: "choice", prompt: "「人」の よみかたは?", kana: "人", options: ["ひと", "ひ", "«ち", "つき"], answer: 0 },
+      { type: "choice", prompt: "「人」の よみかたは?", kana: "人", options: ["ひと", "ひ", "「ち", "つき"], answer: 0 },
       { type: "choice", prompt: "「わたしは がくせい です」の いみは?", kana: "わたしは がくせい です", options: ["saya murid", "kamu guru", "ini buku", "dia teman"], answer: 0 },
       { type: "choice", prompt: "「ごはん」の いみは?", kana: "ごはん", options: ["nasi/makan", "roti", "air", "daging"], answer: 0 },
       { type: "choice", prompt: "「でんしゃ」の いみは?", kana: "でんしゃ", options: ["kereta", "bus", "taksi", "mobil"], answer: 0 },
       { type: "typing", prompt: "ロマジで: たべもの (makanan)", kana: "たべもの", answer: ["tabemono"] },
       { type: "choice", prompt: "「みぎ」の いみは?", kana: "みぎ", options: ["kanan", "kiri", "lurus", "mundur"], answer: 0 },
       { type: "choice", prompt: "「パン」の いみは?", kana: "パン", options: ["roti", "nasi", "teh", "kopi"], answer: 0 },
-      { type: "choice", prompt: "「これは »ん です」の いみは?", kana: "これは »ん です", options: ["ini buku", "itu pensil", "saya murid", "ada sekolah"], answer: 0 },
+      { type: "choice", prompt: "「これは 」ん です」の いみは?", kana: "これは ほん です", options: ["ini buku", "itu pensil", "saya murid", "ada sekolah"], answer: 0 },
       { type: "choice", prompt: "「日」の いみは?", kana: "日", options: ["hari/matahari", "bulan", "api", "air"], answer: 0 },
       { type: "typing", prompt: "ロマジで: よる (malam)", kana: "よる", answer: ["yoru"] },
       { type: "choice", prompt: "「コーヒー」の いみは?", kana: "コーヒー", options: ["kopi", "teh", "susu", "jus"], answer: 0 },

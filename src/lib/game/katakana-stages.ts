@@ -25,7 +25,7 @@ export const KATAKANA_STAGES: Stage[] = [
     ],
     outro: [
       "Phantom Cermin mundur ke dalam danau. 「Hmph. Vokal saja tidak cukup...」",
-      "Yuki: «Bagus! Pola Katakana sama persis dengan Hiragana, hanya bentuknya yang berbeda - lebih bersudut dan tegas.」",
+      "Yuki: 「Bagus! Pola Katakana sama persis dengan Hiragana, hanya bentuknya yang berbeda - lebih bersudut dan tegas.」",
       "**Stage 11 selesai! +60 XP, 20 koin**",
     ],
     lesson: {
@@ -288,7 +288,7 @@ export const KATAKANA_STAGES: Stage[] = [
     ],
     outro: [
       "Tiga sosok hancur bersamaan. Phantom Cermin mundur ke kuil tua.",
-      "Yuki: «Hanya dua deret lagi dan kamu siap menghadapinya!»",
+      "Yuki: 「Hanya dua deret lagi dan kamu siap menghadapinya!」",
       "**Stage 14 selesai! +100 XP, 35 koin**",
     ],
     lesson: {
@@ -481,7 +481,7 @@ export const KATAKANA_STAGES: Stage[] = [
     ],
     outro: [
       "Pintu kuil terbuka berderit.",
-      "Pendeta: «Bagus! Dakuten mengubah K→G, S→Z, T→D, H→B. Ingat pola ini!»",
+      "Pendeta: 「Bagus! Dakuten mengubah K→G, S→Z, T→D, H→B. Ingat pola ini!」",
       "**Stage 16 selesai! +80 XP, 30 koin**",
     ],
     lesson: {
@@ -558,7 +558,7 @@ export const KATAKANA_STAGES: Stage[] = [
     ],
     outro: [
       "Tiga patung hancur. Lorong terbuka lebar.",
-      "Yuki: «Hampir sampai ke cermin utama!»",
+      "Yuki: 「Hampir sampai ke cermin utama!」",
       "**Stage 17 selesai! +100 XP, 35 koin**",
     ],
     lesson: {
@@ -729,7 +729,7 @@ export const KATAKANA_STAGES: Stage[] = [
       "Yuki: 「Ini ujian sebelum menghadap Phantom asli. Gabungkan huruf menjadi kata!」",
     ],
     outro: [
-      "Phantom Cermin mundur ke cermin terakhir. «Pertarungan akhir...»",
+      "Phantom Cermin mundur ke cermin terakhir. 「Pertarungan akhir...」",
       "**Stage 19 selesai! +130 XP, 50 koin**",
     ],
     lesson: {
@@ -815,14 +815,14 @@ export const KATAKANA_STAGES: Stage[] = [
       "Phantom Cermin muncul dalam wujud sebenarnya - sesosok raksasa cermin dengan 7 wajah.",
       "「Aku adalah bayangan semua huruf asing yang tidak kau pelajari.」",
       "「Tapi kau... kau sudah mempelajari Hiragana DAN Katakana. Kau bukan lagi pemula!」",
-      "Yuki: «Pertarungan akhir Bab Katakana! Tunjukkan apa yang kau tahu!»",
+      "Yuki: 「Pertarungan akhir Bab Katakana! Tunjukkan apa yang kau tahu!」",
       "**PERTARUNGAN AKHIR DIMULAI**",
     ],
     outro: [
       "Phantom Cermin pecah menjadi 7 serpihan cahaya.",
       "「Kau... menguasai dua aksara sekaligus... aku... lega...」",
       "Serpihan itu berkumpul menjadi permata keemasan - **Permata Aksara**.",
-      "Yuki: «Kau benar-benar pahlawan Hajimari! Sekarang kau siap ke kerajaan manusia - Vassal Kingdom!»",
+      "Yuki: 「Kau benar-benar pahlawan Hajimari! Sekarang kau siap ke kerajaan manusia - Vassal Kingdom!」",
       "Penduduk desa berkumpul, merayakanmu. Paspor Petualang kini bersinar dengan dua warna.",
       "**BAB 2 SELESAI! +600 XP, 200 koin, Badge: Master Aksara, Item: Permata Aksara**",
       "**Dunia baru sepenuhnya terbuka: Vassal Kingdom (Tingkat Dasar)**",
