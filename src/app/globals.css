@@ -6,13 +6,38 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-gothic);
+  --font-sans: var(--font-gothic), var(--font-noto-jp), sans-serif;
   --font-pixel: var(--font-pixel);
   --font-mono: var(--font-vt);
   --radius-sm: 0;
   --radius-md: 0;
   --radius-lg: 0;
   --radius-xl: 0;
+}
+
+/* ===== FONT FALLBACK CHAIN ===== */
+/* Critical: Japanese characters MUST fall back to CJK-capable fonts.
+   Press Start 2P and VT323 don't support CJK glyphs → show boxes/mojibake.
+   Fallback order: Google Font → system CJK fonts → generic sans-serif */
+
+/* Pixel font (Press Start 2P) - no CJK support, MUST fall back */
+.font-pixel {
+  font-family: var(--font-pixel), var(--font-noto-jp), "Noto Sans JP", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", sans-serif;
+}
+
+/* Gothic font (DotGothic16) - supports CJK, but add fallback just in case */
+.font-gothic {
+  font-family: var(--font-gothic), var(--font-noto-jp), "Noto Sans JP", "DotGothic16", "IPAGothic", "Noto Sans SC", "LXGW WenKai", sans-serif;
+}
+
+/* VT323 font - no CJK support, MUST fall back */
+.font-vt {
+  font-family: var(--font-vt), var(--font-noto-jp), "Noto Sans JP", "DotGothic16", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", monospace;
+}
+
+/* Body default - always include CJK fallback */
+html, body {
+  font-family: var(--font-gothic), var(--font-noto-jp), "Noto Sans JP", "DotGothic16", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", system-ui, sans-serif;
 }
 
 /* ===== KOTOBAQUEST 8-BIT RPG PALETTE ===== */
@@ -69,7 +94,7 @@ body {
   padding: 0;
   background: var(--kq-bg);
   color: var(--kq-fg);
-  font-family: var(--font-gothic), "DotGothic16", system-ui, sans-serif;
+  font-family: var(--font-gothic), var(--font-noto-jp), "Noto Sans JP", "DotGothic16", "IPAGothic", "Noto Sans SC", "LXGW WenKai", "WenQuanYi Zen Hei", system-ui, sans-serif;
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: grayscale;
   image-rendering: pixelated;
@@ -101,16 +126,16 @@ body {
   color: var(--kq-panel-border);
 }
 
-/* ===== PIXEL UTILITIES ===== */
+/* ===== PIXEL UTILITIES (with CJK fallback) ===== */
 .font-pixel {
-  font-family: var(--font-pixel), "Press Start 2P", monospace;
+  font-family: var(--font-pixel), "Press Start 2P", var(--font-noto-jp), "Noto Sans JP", sans-serif;
   letter-spacing: 0.05em;
 }
 .font-gothic {
-  font-family: var(--font-gothic), "DotGothic16", sans-serif;
+  font-family: var(--font-gothic), "DotGothic16", var(--font-noto-jp), "Noto Sans JP", sans-serif;
 }
 .font-vt {
-  font-family: var(--font-vt), "VT323", monospace;
+  font-family: var(--font-vt), "VT323", var(--font-noto-jp), "Noto Sans JP", "DotGothic16", monospace;
 }
 
 /* Pixelated rendering for images & sprites */
@@ -156,7 +181,7 @@ body {
 
 /* ===== PIXEL BUTTON ===== */
 .kq-btn {
-  font-family: var(--font-pixel), "Press Start 2P", monospace;
+  font-family: var(--font-pixel), "Press Start 2P", var(--font-noto-jp), "Noto Sans JP", "IPAGothic", "Noto Sans SC", sans-serif;
   font-size: 0.7rem;
   letter-spacing: 0.05em;
   background: var(--kq-panel);

@@ -471,7 +471,7 @@ export function EndlessMode() {
                           ? "var(--kq-attack)"
                           : "var(--kq-panel)",
                       color: "var(--kq-panel-border)",
-                      fontFamily: currentQuestion.type === "kana" ? "var(--font-gothic)" : "var(--font-vt)",
+                      fontFamily: currentQuestion.type === "kana" ? "var(--font-gothic), var(--font-noto-jp), \"Noto Sans JP\", sans-serif" : "var(--font-vt), var(--font-noto-jp), \"Noto Sans JP\", monospace",
                       fontSize: currentQuestion.type === "kana" ? "1.5rem" : "1rem",
                     }}
                   >

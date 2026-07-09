@@ -456,7 +456,7 @@ export function Practice() {
                           ? "var(--kq-correct)"
                           : "var(--kq-panel)",
                       color: "var(--kq-panel-border)",
-                      fontFamily: "var(--font-gothic)",
+                      fontFamily: "var(--font-gothic), var(--font-noto-jp), \"Noto Sans JP\", \"IPAGothic\", \"Noto Sans SC\", sans-serif",
                       fontSize: "1rem",
                     }}
                   >

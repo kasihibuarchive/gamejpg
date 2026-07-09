@@ -1504,7 +1504,7 @@ export function BattleScreen() {
                             ? "var(--kq-panel)"
                             : "var(--kq-panel-border)",
                         textTransform: "none",
-                        fontFamily: "var(--font-gothic)",
+                        fontFamily: "var(--font-gothic), var(--font-noto-jp), \"Noto Sans JP\", \"IPAGothic\", \"Noto Sans SC\", sans-serif",
                         fontSize: "1rem",
                       }}
                     >

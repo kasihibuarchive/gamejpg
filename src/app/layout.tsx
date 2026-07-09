@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Press_Start_2P, DotGothic16, VT323 } from "next/font/google";
+import { Press_Start_2P, DotGothic16, VT323, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -24,14 +24,21 @@ const vtFont = VT323({
   display: "swap",
 });
 
+// Noto Sans JP - CJK fallback font, ensures ALL Japanese characters render
+const notoJP = Noto_Sans_JP({
+  variable: "--font-noto-jp",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "KotobaQuest - 8-bit RPG Belajar Bahasa Jepang",
   description:
-    "Petualangan epik mempelajari bahasa Jepang dari Dasar hingga JLPT N1. Bertarung, menjelajah, dan kuasai huruf, kosakata, dan kanji dalam dunia RPG 8-bit modern.",
+    "Petualangan epik mempelajari bahasa Jepang. Bertarung, menjelajah, dan kuasai huruf, kosakata, dan kanji dalam dunia RPG 8-bit modern.",
   keywords: [
     "KotobaQuest",
     "Belajar Bahasa Jepang",
-    "JLPT",
     "Hiragana",
     "Katakana",
     "Kanji",
@@ -50,7 +57,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body
-        className={`${pixelFont.variable} ${gothicFont.variable} ${vtFont.variable} antialiased bg-kq-bg text-kq-fg`}
+        className={`${pixelFont.variable} ${gothicFont.variable} ${vtFont.variable} ${notoJP.variable} antialiased bg-kq-bg text-kq-fg`}
       >
         {children}
         <Toaster />
