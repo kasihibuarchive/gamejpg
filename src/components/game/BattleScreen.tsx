@@ -1472,10 +1472,16 @@ export function BattleScreen() {
                (currentQuestion.prompt.includes("arti") ||
                 currentQuestion.prompt.includes("いみ") ||
                 currentQuestion.prompt.includes("よみ") ||
-                currentQuestion.prompt.includes("bacaan")))
+                currentQuestion.prompt.includes("読み") ||
+                currentQuestion.prompt.includes("bacaan") ||
+                currentQuestion.prompt.includes("の中の")))
             ) && (
               <div
-                className="jp-text text-6xl md:text-7xl my-3 kq-pop"
+                className={`jp-text my-3 kq-pop ${
+                  currentQuestion.kana && currentQuestion.kana.length > 10
+                    ? "text-3xl md:text-4xl"
+                    : "text-6xl md:text-7xl"
+                }`}
                 style={{ color: "var(--kq-panel-border)" }}
               >
                 {currentQuestion.kana}

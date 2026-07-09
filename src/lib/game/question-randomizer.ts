@@ -4,6 +4,7 @@
 // Clean answers: removes parenthetical notes, simplifies for kid-friendly options.
 
 import type { Question, ChoiceQuestion, TypingQuestion, MatchingQuestion, Stage } from "./types";
+import { generateKanjiReadingQuestions } from "./kanji-compounds";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -239,6 +240,18 @@ export function expandQuestionPool(stage: Stage): Question[] {
         hint: `Romaji: ${cleanRomaji(row.romaji)}`,
       });
     }
+  }
+
+  // 6. NEW: JLPT-style kanji compound reading questions
+  // "「一人ぼっちで すんでいます」の中の「一人」の読み方は?"
+  // Pick 5 kanji reading questions based on stage's world level
+  const worldLevelMap: Record<string, number> = {
+    hajimari: 1, n5: 2, n4: 3, n3: 4, n2: 5, n1: 6,
+  };
+  const worldLevel = worldLevelMap[stage.worldId] || 2;
+  if (worldLevel >= 2) {
+    const kanjiQuestions = generateKanjiReadingQuestions(worldLevel, 5);
+    extra.push(...kanjiQuestions);
   }
 
   // Combine original + extra, dedup by prompt
